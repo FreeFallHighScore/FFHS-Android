@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg"
+    >
+
+   		    
+	<ImageView
+	     android:id="@+id/left"
+	     android:layout_height="wrap_content"
+	     android:layout_width="wrap_content"
+	     android:src="@drawable/overlay_left"
+	     android:gravity="top"
+	     android:scaleType="matrix"
+     	/>
+     <ImageView
+	     android:id="@+id/center"
+	     android:layout_height="wrap_content"
+	     android:layout_width="wrap_content"
+	     android:src="@drawable/clip"
+	     android:layout_toRightOf="@id/left"
+	     android:scaleType="matrix"
+     	/>
+	<ImageView
+	     android:id="@+id/logo"
+	     android:layout_height="wrap_content"
+	     android:layout_width="wrap_content"
+	     android:src="@drawable/logo_black"
+	     android:layout_toRightOf="@id/left"
+	     android:scaleType="matrix"
+	     android:background="#AAFFFFFF"
+	     android:paddingBottom="20dip"
+	     android:paddingLeft= "38dip"
+	     android:paddingRight="38dip"
+     	/> 
+     <ImageView
+	     android:id="@+id/right"
+	     android:layout_height="wrap_content"
+	     android:layout_width="wrap_content"
+	     android:src="@drawable/overlay_right"
+		android:layout_toRightOf="@id/center"
+	     android:scaleType="matrix"
+	     
+     	/>
+     
+
+     
+ 	<Button
+		android:id="@+id/what"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="WHAT?"
+		android:onClick="buttonPressed"
+		android:textSize="30dip"
+		android:background="@drawable/login_btn"
+		android:layout_marginTop="50dip"
+
+	    />
+	    
+	<Button
+		android:id="@+id/login"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="LOGIN"
+		android:onClick="buttonPressed"
+		android:textSize="30dip"
+		android:layout_below="@id/what"
+		android:layout_marginTop="10dip"
+		android:background="@drawable/login_btn"
+	    />
+
+	<Button
+		android:id="@+id/start"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="START"
+		android:onClick="buttonPressed"
+		android:textSize="30dip"
+		android:layout_below="@id/login"
+		android:layout_marginTop="10dip"
+		android:background="@drawable/drop_btn"
+		android:gravity="top|center_horizontal"
+		android:paddingTop="15dip"
+	
+	    />
+	    
+
+	 <Button
+		android:id="@+id/info"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:onClick="buttonPressed"
+		android:layout_alignParentRight="true"
+		android:layout_marginTop="10dip"
+		android:layout_marginRight="10dip"
+		android:background="@drawable/i_btn"
+
+	    /> 
+	    
+
+
+ <!--   
+	<TextView  
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="This is a test!"
+   		android:id="@+id/tv"
+   		android:textColor="#000000"
+   		/>
+   		 -->  
+   		
+   		
+</RelativeLayout>
