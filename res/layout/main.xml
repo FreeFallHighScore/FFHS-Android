@@ -3,9 +3,14 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/bg"
+   
     >
-
+    
+    <SurfaceView
+		android:id="@+id/CameraView"
+		android:layout_width="640px"
+		android:layout_height="480px" />
+    
    		    
 	<ImageView
 	     android:id="@+id/left"
@@ -23,18 +28,7 @@
 	     android:layout_toRightOf="@id/left"
 	     android:scaleType="matrix"
      	/>
-	<ImageView
-	     android:id="@+id/logo"
-	     android:layout_height="wrap_content"
-	     android:layout_width="wrap_content"
-	     android:src="@drawable/logo_black"
-	     android:layout_toRightOf="@id/left"
-	     android:scaleType="matrix"
-	     android:background="#AAFFFFFF"
-	     android:paddingBottom="20dip"
-	     android:paddingLeft= "38dip"
-	     android:paddingRight="38dip"
-     	/> 
+
      <ImageView
 	     android:id="@+id/right"
 	     android:layout_height="wrap_content"
@@ -44,48 +38,102 @@
 	     android:scaleType="matrix"
 	     
      	/>
+     	
+     	
      
 
-     
- 	<Button
-		android:id="@+id/what"
+     <ImageView
+     	android:id="@+id/drawer"
 		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:text="WHAT?"
-		android:onClick="buttonPressed"
-		android:textSize="30dip"
-		android:background="@drawable/login_btn"
-		android:layout_marginTop="50dip"
-
-	    />
+	    android:layout_width="wrap_content"
+	    android:layout_toRightOf="@id/left"
+        android:src="@drawable/overlay_white"
+	     android:scaleType="matrix"
+     />
+          <ImageView
+	     android:id="@+id/logo"
+	     android:layout_height="wrap_content"
+	     android:layout_width="wrap_content"
+	     android:src="@drawable/logo_black"
+	     android:layout_toRightOf="@id/left"
+	     android:scaleType="matrix"
+	     android:paddingTop="30dip"
+	     android:paddingLeft= "60dip"
+     	/> 
+     	
+     <ImageView
+	     android:id="@+id/logo_white"
+	     android:layout_height="wrap_content"
+	     android:layout_width="wrap_content"
+	     android:src="@drawable/logo_white"
+	     android:scaleType="matrix"
+	     android:background="#000000"
+	     android:padding="20dip"
+	     android:layout_alignParentRight="true"
+	     android:layout_marginTop="20dip"
+   	     android:visibility="gone"
+     	/> 
 	    
-	<Button
-		android:id="@+id/login"
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:text="LOGIN"
-		android:onClick="buttonPressed"
-		android:textSize="30dip"
-		android:layout_below="@id/what"
-		android:layout_marginTop="10dip"
-		android:background="@drawable/login_btn"
-	    />
-
 	<Button
 		android:id="@+id/start"
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"
 		android:text="START"
-		android:onClick="buttonPressed"
 		android:textSize="30dip"
-		android:layout_below="@id/login"
-		android:layout_marginTop="10dip"
+		android:layout_marginTop="200dip"
 		android:background="@drawable/drop_btn"
 		android:gravity="top|center_horizontal"
-		android:paddingTop="15dip"
-	
+		android:paddingTop="5dip"
+		android:onClick="startDrop"
 	    />
 	    
+	 <Button
+		android:id="@+id/cancel"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="CANCEL"
+		android:textSize="30dip"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="20dip"
+		android:background="@drawable/delete_btn"
+		android:gravity="top|center_horizontal"
+		android:paddingLeft="45dip"
+		android:paddingTop="5dip"
+		android:onClick="cancelDrop"
+		android:visibility="gone"
+	    />
+	    
+	 <ImageView 
+		android:id="@+id/circle"
+		android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:src="@drawable/progress_wheel01"
+	    android:layout_alignParentBottom="true"
+	    android:paddingLeft="20dip"
+	    android:paddingBottom="20dip"
+	    android:visibility="gone"
+	/>
+	
+	<ImageView 
+		android:id="@+id/circle"
+		android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:src="@drawable/progress_wheel01"
+	    android:layout_alignParentBottom="true"
+	    android:paddingLeft="20dip"
+	    android:paddingBottom="20dip"
+	    android:visibility="gone"
+	/>
+	
+	<ImageView 
+		android:id="@+id/recording"
+		android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:src="@drawable/recording_flash_up"
+	    android:paddingLeft="250dip"
+	    android:visibility="gone"
+	/>
 
 	 <Button
 		android:id="@+id/info"
@@ -93,23 +141,25 @@
 		android:layout_width="wrap_content"
 		android:onClick="buttonPressed"
 		android:layout_alignParentRight="true"
-		android:layout_marginTop="10dip"
-		android:layout_marginRight="10dip"
+		android:layout_marginTop="20dip"
+		android:layout_marginRight="20dip"
 		android:background="@drawable/i_btn"
-
 	    /> 
-	    
-
-
- <!--   
+ 
 	<TextView  
-	    android:layout_width="fill_parent" 
+	   	android:id="@+id/go"
+	    android:layout_width="wrap_content" 
 	    android:layout_height="wrap_content" 
-	    android:text="This is a test!"
-   		android:id="@+id/tv"
-   		android:textColor="#000000"
+	    android:text="GO FOR IT!"
+   		android:textColor="#FFFFFF"
+   		android:background="#000000"
+   		android:textSize="28sp"
+   		android:layout_marginTop="40dip"
+		android:layout_marginLeft="60dip"
+		android:padding="5dip"
+		android:visibility="gone"	
    		/>
-   		 -->  
+   		
    		
    		
 </RelativeLayout>
