@@ -57,6 +57,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	protected GameState state; 
 	
 	private static final int AUTH_REQ = 1;
+	private static final int UPLOAD_VIDEO = 2;
 	
 	protected float currentDrawerLevel;
 	protected float freefallDuration;
@@ -91,6 +92,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	boolean recording = false;
 	public static final String TAG = "VIDEOCAPTURE";
+
 	int count= 0;
 
 	@Override
@@ -365,9 +367,18 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		switch (requestCode) {
 		case AUTH_REQ:
 			if (resultCode == Activity.RESULT_OK) {
-				oauthConfig = (OAuthConfig)data.getSerializableExtra(AuthActivity.OAUTH_RESULT_DATA_KEY);
+				oauthConfig = (OAuthConfig)data.getSerializableExtra(OAuthConfig.class.getCanonicalName());
 				Toast.makeText(this, "You are now authed.", Toast.LENGTH_LONG);
 				loginBtn.setVisibility(View.GONE);
+			}
+			break;
+		case UPLOAD_VIDEO:
+			if (resultCode == Activity.RESULT_OK) {
+				oauthConfig = (OAuthConfig)data.getSerializableExtra(OAuthConfig.class.getCanonicalName());
+				
+				// TODO: show success message here instead of the 'just opened' state
+				changeState(GameState.kFFStateJustOpened);
+				
 			}
 			break;
 		}
@@ -708,8 +719,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		Intent i = new Intent(getApplicationContext(), UploadActivity.class);
 		i.putExtra("videoFileName", getVideoFilePath());
 		i.putExtra(OAuthConfig.class.getCanonicalName(), oauthConfig);
-		startActivity(i);
-		
+		startActivityForResult(i, UPLOAD_VIDEO);
 	}
 	
 	

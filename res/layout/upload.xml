@@ -54,5 +54,12 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="right"
 		android:text="Upload" />
+		
+	<ProgressBar 
+		android:id="@+id/upload_progress"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		style="@android:style/Widget.ProgressBar.Horizontal"
+		android:visibility="gone" />
 
 </LinearLayout>

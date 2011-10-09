@@ -8,12 +8,12 @@ import java.net.URLEncoder;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +44,8 @@ public class UploadActivity extends Activity implements OnClickListener {
 	EditText videoDescInput;
 	Button uploadButton;
 	
+	ProgressBar uploadProgress;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,6 +72,8 @@ public class UploadActivity extends Activity implements OnClickListener {
 		videoTitleInput = (EditText) findViewById(R.id.video_title_input);
 		videoDescInput = (EditText) findViewById(R.id.video_desc_input);
 		uploadButton = (Button) findViewById(R.id.upload_button);
+		
+		uploadProgress = (ProgressBar) findViewById(R.id.upload_progress);
 	}
 	
 	// technically, probably slow. But...less boilerplate
@@ -125,8 +129,21 @@ public class UploadActivity extends Activity implements OnClickListener {
 		String title = videoTitleInput.getText().toString();
 		String desc = videoDescInput.getText().toString();
 		
+		File f = new File(videoFileName);
+		
+		Log.d(TAG, "File length: " + f.length());
+		
+		uploadProgress.setProgress(0);
+		uploadProgress.setMax(Long.valueOf(f.length()).intValue());
+		
 		VideoUploadTask uploadRunnable = new VideoUploadTask(
 				title, desc, videoFileName, getString(R.string.devId), oauthConfig);
+		
+		videoTitleInput.setEnabled(false);
+		videoDescInput.setEnabled(false);
+		loginLogoutButton.setEnabled(false);
+		uploadButton.setVisibility(View.GONE);
+		uploadProgress.setVisibility(View.VISIBLE);
 		
 		// TODO: what happens if there's no video here?
 		
@@ -136,7 +153,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 		
 	}
 
-	private static class VideoUploadTask implements Runnable, ByteWrittenListener {
+	private class VideoUploadTask implements Runnable, ByteWrittenListener {
 		
 		private String title;
 		private String desc;
@@ -156,22 +173,18 @@ public class UploadActivity extends Activity implements OnClickListener {
 
 		@Override
 		public void run() {
+			
+			boolean errorOccurred = false;
+			
 			HttpTransport transport = new NetHttpTransport();
 			JsonFactory jsonFactory = new JacksonFactory();
 			try {
 				YouTubeClient client = YouTubeClient.buildAuthorizedClient(transport, jsonFactory, oauthConfig, devId);
 				
-				// TODO: update this section with the path to the video file...
-				/*File sdCardDir = Environment.getExternalStorageDirectory();
-				File videoFileParentDir = new File(sdCardDir, "com.roblg.android.youtubetest");
-				File videoFile = new File(videoFileParentDir, "testvideo.m4v");
-				*/
 				File videoFile = new File(fileName);
 				Log.d(TAG, "File name: " + videoFile.getAbsolutePath());
 				Log.d(TAG, "Exists? " + videoFile.exists());
 				
-				totalBytes = videoFile.length();
-				Log.d(TAG, "File length: " + totalBytes);
 				UploadRequestData data = new UploadRequestData();
 				data.title = this.title;
 				
@@ -182,29 +195,53 @@ public class UploadActivity extends Activity implements OnClickListener {
 				data.fileData = new FileInputStream(videoFile);
 				client.executeUpload(data, this);
 			} catch (IOException e) {
-				// TODO: better error handling
-				throw new RuntimeException("Error creating youtube client or uploading", e);
+				errorOccurred = true;
+				Log.e(TAG, "Error creating youtube client or uploading", e);
+				// TODO: better error handling?
+			} finally {
+				onComplete(errorOccurred);
 			}
 		}
-
-		private long totalBytes = 0;
-		private long bytesWritten = 0;
 		
-		private double lastWritten = 0.0;
+		public void onComplete(boolean error) {
+			if (!error) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(UploadActivity.this, "Upload successful!", Toast.LENGTH_LONG);
+						uploadProgress.setVisibility(View.GONE);
+						// TODO: jump back to start screen with 'SUCCESS' message
+						
+						Intent result = new Intent();
+						// TODO: any other data we want to put here?
+						
+						// guaranteed that OAuthConfig is non-null here. Let's pass that
+						// login info back to the main screen.
+						result.putExtra(OAuthConfig.class.getCanonicalName(), oauthConfig);
+						
+						setResult(Activity.RESULT_OK, result);
+						finish();
+					}
+				});
+			} else {
+				// TODO:
+			}
+		}
+		
+		private long bytesWritten = 0;
 		
 		@Override
 		public void byteWritten() {
 			bytesWritten++;
 			
-			if (bytesWritten % 1000000 == 0) {
-				Log.d(TAG, "Bytes Written: " + bytesWritten);
-			}
-			
-			double percentageWritten = bytesWritten / (totalBytes * 1.0);
-			percentageWritten = Math.round(percentageWritten) / 10;
-			if (percentageWritten > lastWritten) {
-				Log.d(TAG, "WOOHOO: " + percentageWritten);
-				lastWritten = percentageWritten;
+			if (bytesWritten % 100000 == 0) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Log.d(TAG, "Bytes Written: " + bytesWritten);
+						uploadProgress.setProgress((int)bytesWritten);
+					}
+				});				
 			}
 		}
 	}
@@ -217,7 +254,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 		switch (requestCode) {
 		case AUTH_REQ:
 			if (resultCode == Activity.RESULT_OK) {
-				oauthConfig = (OAuthConfig)data.getSerializableExtra(AuthActivity.OAUTH_RESULT_DATA_KEY);
+				oauthConfig = (OAuthConfig)data.getSerializableExtra(OAuthConfig.class.getCanonicalName());
 				updateLoginLogoutButtonDisplay();
 				Toast.makeText(this, "You are now authed.", Toast.LENGTH_LONG);
 			}

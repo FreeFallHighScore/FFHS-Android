@@ -16,8 +16,6 @@ public class AuthActivity extends Activity {
 	
 	private static final String YOUTUBE_SCOPE = "http://gdata.youtube.com";
 	
-	public static final String OAUTH_RESULT_DATA_KEY = "com.freefallhighscore.android.youtube.OAuthConfig"; 
-	
 	WebView webView;
 	
 	String oauthClientId;
@@ -51,7 +49,7 @@ public class AuthActivity extends Activity {
 					Uri redirectUri = Uri.parse(url);
 					webView.stopLoading();
 					Intent result = new Intent();
-					result.putExtra(OAUTH_RESULT_DATA_KEY, new OAuthConfig(
+					result.putExtra(OAuthConfig.class.getCanonicalName(), new OAuthConfig(
 						oauthClientId,
 						oauthClientSecret,
 						oauthRedirectUri,
