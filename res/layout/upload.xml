@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" 
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		
+		<Button
+			android:id="@+id/back"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.5"
+			android:text="Back" />
+			
+		<!-- TODO: these widths should probably be dynamic -->
+		<TextView
+			android:id="@+id/fall_duration"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.5"
+			android:text="" />
+	
+		<Button
+			android:id="@+id/login_logout_button"
+			android:layout_width="0dp" 
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:text="Login" />
+		
+	</LinearLayout>
+	
+	<EditText 
+		android:id="@+id/video_title_input" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content" 
+		android:hint="Video Title" />
+		
+	<EditText 
+		android:id="@+id/video_desc_input" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:minLines="1"
+		android:maxLines="3"
+		android:inputType="textMultiLine" 
+		android:hint="Tell us about it!" />
+	
+	<Button
+		android:id="@+id/upload_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="right"
+		android:text="Upload" />
+
+</LinearLayout>

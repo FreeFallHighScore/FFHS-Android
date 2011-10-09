@@ -11,7 +11,7 @@
 		android:layout_width="640px"
 		android:layout_height="480px" />
     
-   		    
+   	<!--  LEFT OVERLAY -->	    
 	<ImageView
 	     android:id="@+id/left"
 	     android:layout_height="wrap_content"
@@ -20,6 +20,8 @@
 	     android:gravity="top"
 	     android:scaleType="matrix"
      	/>
+     	
+   	<!--  CENTER OVERLAY -->	         	
      <ImageView
 	     android:id="@+id/center"
 	     android:layout_height="wrap_content"
@@ -29,28 +31,30 @@
 	     android:scaleType="matrix"
      	/>
 
+   	<!--  RIGHT OVERLAY -->	         	
      <ImageView
 	     android:id="@+id/right"
 	     android:layout_height="wrap_content"
 	     android:layout_width="wrap_content"
 	     android:src="@drawable/overlay_right"
-		android:layout_toRightOf="@id/center"
+		 android:layout_toRightOf="@id/center"
 	     android:scaleType="matrix"
-	     
      	/>
      	
      	
-     
-
+  
+   	<!--  DRAWER -->	         	
      <ImageView
      	android:id="@+id/drawer"
 		android:layout_height="wrap_content"
 	    android:layout_width="wrap_content"
 	    android:layout_toRightOf="@id/left"
         android:src="@drawable/overlay_white"
-	     android:scaleType="matrix"
+	    android:scaleType="matrix"
      />
-          <ImageView
+    
+    <!-- BLACK LOGO -->
+    <ImageView
 	     android:id="@+id/logo"
 	     android:layout_height="wrap_content"
 	     android:layout_width="wrap_content"
@@ -61,6 +65,7 @@
 	     android:paddingLeft= "60dip"
      	/> 
      	
+    <!-- WHITE LOGO -->
      <ImageView
 	     android:id="@+id/logo_white"
 	     android:layout_height="wrap_content"
@@ -74,6 +79,19 @@
    	     android:visibility="gone"
      	/> 
 	    
+	<!--  START BUTTON -->
+	<Button
+		android:id="@+id/login_btn"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="LOGIN"
+		android:textSize="30dip"
+		android:layout_marginTop="140dip"
+		android:background="@drawable/login_btn_up"
+		android:gravity="top|center_horizontal"
+		android:paddingTop="5dip"
+	    />
+	    
 	<Button
 		android:id="@+id/start"
 		android:layout_height="wrap_content"
@@ -84,9 +102,10 @@
 		android:background="@drawable/drop_btn"
 		android:gravity="top|center_horizontal"
 		android:paddingTop="5dip"
-		android:onClick="startDrop"
+		android:onClick="startRecording"
 	    />
-	    
+	 
+	 <!--  CANCEL BUTTON -->   
 	 <Button
 		android:id="@+id/cancel"
 		android:layout_height="wrap_content"
@@ -103,7 +122,8 @@
 		android:onClick="cancelDrop"
 		android:visibility="gone"
 	    />
-	    
+	   
+	 <!--
 	 <ImageView 
 		android:id="@+id/circle"
 		android:layout_height="wrap_content"
@@ -115,6 +135,7 @@
 	    android:visibility="gone"
 	/>
 	
+	 
 	<ImageView 
 		android:id="@+id/circle"
 		android:layout_height="wrap_content"
@@ -125,7 +146,8 @@
 	    android:paddingBottom="20dip"
 	    android:visibility="gone"
 	/>
-	
+	 -->
+	 
 	<ImageView 
 		android:id="@+id/recording"
 		android:layout_height="wrap_content"
@@ -135,6 +157,7 @@
 	    android:visibility="gone"
 	/>
 
+	<!-- 
 	 <Button
 		android:id="@+id/info"
 		android:layout_height="wrap_content"
@@ -145,7 +168,8 @@
 		android:layout_marginRight="20dip"
 		android:background="@drawable/i_btn"
 	    /> 
- 
+  	-->
+  
 	<TextView  
 	   	android:id="@+id/go"
 	    android:layout_width="wrap_content" 
@@ -160,6 +184,90 @@
 		android:visibility="gone"	
    		/>
    		
+   	<!--  TEMP BUTTONS -->
+   	<Button
+   		android:id="@+id/tempStartFall" 
+   		android:layout_width="wrap_content" 
+   		android:layout_height="wrap_content"
+   		android:text="Start Fall"
+   		android:visibility="gone" />
+
+   	<Button
+   		android:id="@+id/tempStopFall" 
+   		android:layout_width="wrap_content" 
+   		android:layout_height="wrap_content"
+   		android:paddingTop="30dp"
+   		android:text="Stop Fall"
+   		android:visibility="gone" />
+
+	<Spinner 
+        android:id="@+id/videoPlaybackSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+   		<!-- END TEMP! -->
    		
+   	<!--  SCORE VIEW -->
+   	
+   	<TextView  
+	   	android:id="@+id/score"
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
+	    android:text="1.254s"
+   		android:textColor="#FFFFFF"
+   		android:background="#000000"
+   		android:textSize="28sp"
+   		android:layout_marginTop="40dip"
+		android:layout_marginLeft="60dip"
+		android:padding="5dip"
+		android:visibility="gone"	
+   		/>
+   	
+   	<!--  SUBMIT -->
+	<Button
+		android:id="@+id/submit"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="SUBMIT"
+		android:textSize="30dip"
+		android:layout_marginTop="120dip"
+		android:background="@drawable/submit_btn_up"
+		android:gravity="top|center_horizontal"
+		android:paddingTop="5dip"
+		android:onClick="submitClip"
+		android:visibility="gone"
+	    />
+
+   	<!--  REPLAY -->	
+	<Button
+		android:id="@+id/replay"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="REPLAY"
+		android:textSize="30dip"
+		android:layout_marginTop="160dip"
+		android:background="@drawable/play_btn_up"
+		android:gravity="top|center_horizontal"
+		android:paddingTop="5dip"
+		android:onClick="replayClip"
+		android:visibility="gone"
+	    />
    		
+   	<!--  DELETE -->	
+	<Button
+		android:id="@+id/delete"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="DELETE"
+		android:textSize="30dip"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="20dip"
+		android:background="@drawable/delete_btn"
+		android:gravity="top|center_horizontal"
+		android:paddingLeft="45dip"
+		android:paddingTop="5dip"
+		android:onClick="deleteClip"
+		android:visibility="gone"
+	    />
 </RelativeLayout>

@@ -32,10 +32,10 @@ public class TabsActivity extends TabActivity implements OnTabChangeListener {
 
 	private TabHost tabHost;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
 
 		tabHost = getTabHost();
 		tabHost.setOnTabChangedListener(this);
@@ -81,7 +81,7 @@ public class TabsActivity extends TabActivity implements OnTabChangeListener {
 			}
 		}));
 
-    }
+	}
 
 	/**
 	 * Implement logic here when a tab is selected

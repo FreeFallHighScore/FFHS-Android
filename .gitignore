@@ -1,2 +1,6 @@
 .DS_Store
 res/.DS_Store
+bin/*
+gen/*
+
+oauth_config.xml
