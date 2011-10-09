@@ -405,6 +405,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				slide(drawer,0,0,-100,-20,1000);
 				
 				bringDrawerToLevel(.8f);
+				
+				tempStartFall.setVisibility(View.GONE);
+				
 			break;
 			
 			case kFFStatePreDropRecording:
@@ -453,6 +456,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				hideToRight(cancelBtn);
 				revealFromLeft(loginBtn);
 				revealFromLeft(startBtn);
+				
+				tempStartFall.setVisibility(View.GONE);
+				
 			break;
 			
 			case kFFStateInFreeFall:
@@ -505,14 +511,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		changeState(GameState.kFFStatePreDropRecording);
 		recording = true;
 		recorder.start();	
-	}
-
-	public void cancelDrop(View view){
-		recorder.stop();
-		recorder.reset();
-		recording = false;
-		
-		changeState(GameState.kFFStatePreDropCanceled);
 	}
 
 	private void initRecorder() {
@@ -712,6 +710,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	
 	public void deleteClip(View view){
 		//TODO: delete clip
+		recorder.reset();
+		initRecorder();
+		prepareRecorder();
 		changeState(GameState.kFFStateReadyToDrop);
 	}
 	
@@ -720,6 +721,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		i.putExtra("videoFileName", getVideoFilePath());
 		i.putExtra(OAuthConfig.class.getCanonicalName(), oauthConfig);
 		startActivityForResult(i, UPLOAD_VIDEO);
+	}
+	
+	public void cancelDrop(View view){
+		recorder.stop();
+		recording = false;
+		initRecorder();
+		prepareRecorder();
+		changeState(GameState.kFFStatePreDropCanceled);
 	}
 	
 	

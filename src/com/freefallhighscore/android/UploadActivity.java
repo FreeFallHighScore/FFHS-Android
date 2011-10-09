@@ -210,7 +210,6 @@ public class UploadActivity extends Activity implements OnClickListener {
 					public void run() {
 						Toast.makeText(UploadActivity.this, "Upload successful!", Toast.LENGTH_LONG);
 						uploadProgress.setVisibility(View.GONE);
-						// TODO: jump back to start screen with 'SUCCESS' message
 						
 						Intent result = new Intent();
 						// TODO: any other data we want to put here?
@@ -224,7 +223,12 @@ public class UploadActivity extends Activity implements OnClickListener {
 					}
 				});
 			} else {
-				// TODO:
+				// if there was an error, reset the buttons
+				videoTitleInput.setEnabled(true);
+				videoDescInput.setEnabled(true);
+				loginLogoutButton.setEnabled(true);
+				uploadButton.setVisibility(View.VISIBLE);
+				uploadProgress.setVisibility(View.GONE);
 			}
 		}
 		

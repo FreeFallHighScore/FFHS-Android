@@ -95,6 +95,7 @@ public class YouTubeClient {
 			uploadUrl = initialUploadResponse.headers.location;
 			System.out.println(uploadUrl);
 		} catch (HttpResponseException e) {
+			// TODO better error handling
 			Log.e(TAG, "An error occurred updating Youtube", e);
 			System.out.println(e.response.parseAsString());
 		}
@@ -115,6 +116,7 @@ public class YouTubeClient {
 			try {
 				actualRequest.execute().parseAsString();
 			} catch (HttpResponseException e) {
+				// TODO: better error handling
 				Log.e(TAG, "An error occurred uploading to Youtube", e);
 				System.err.println(e.response.parseAsString());
 			}
