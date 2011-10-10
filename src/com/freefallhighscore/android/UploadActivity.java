@@ -191,6 +191,16 @@ public class UploadActivity extends Activity implements OnClickListener {
 				data.fileName = URLEncoder.encode(videoFile.getName(), "UTF-8");
 				data.fileData = new FileInputStream(videoFile);
 				client.executeUpload(data, this);
+				
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						// if we made it this far, set the value to the max value
+						// we've earned it!
+						uploadProgress.setProgress(uploadProgress.getMax());
+					}
+				});
+				
 			} catch (IOException e) {
 				errorOccurred = true;
 				Log.e(TAG, "Error creating youtube client or uploading", e);
@@ -230,7 +240,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 		public void byteWritten() {
 			bytesWritten++;
 			
-			if (bytesWritten % 100000 == 0) {
+			if (bytesWritten % 10000 == 0) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {

@@ -103,9 +103,8 @@ public class YouTubeClient {
 		} catch (HttpResponseException e) {
 			// TODO: better error handling
 			Log.e(TAG, "An error occurred retrieving profile from Youtube", e);
-			
 			Log.d(TAG, "Error response text: " + e.response.parseAsString());
-			return null;
+			throw e;
 		}
 	}
 	
