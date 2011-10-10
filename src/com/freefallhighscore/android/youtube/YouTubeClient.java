@@ -57,8 +57,10 @@ public class YouTubeClient {
 		HttpTransport transport = new NetHttpTransport();
 		JsonFactory jsonFactory = new JacksonFactory();
 		
-		if (null == oauthConfig.getOauthAccessToken()) {
-			// if we dont have any access token, we need to authorize
+		if (!oauthConfig.hasAccessToken()) {
+			// if we dont have any access token, we need to trade in our oauth auth code
+			// for an access token. And we'll just update the oauthConfig with that accessToken
+			// and the refreshCode (which theoretically is handled by YouTubeProtectedResource)
 			authorizeAndUpdateOAuth(transport, jsonFactory, oauthConfig);
 		}
 		
@@ -76,7 +78,14 @@ public class YouTubeClient {
 				jsonFactory, oauthConfig.getOauthClientId(), oauthConfig.getOauthClientSecret(),
 				oauthConfig.getOauthAuthorizationCode(), oauthConfig.getOauthRedirectUri());
 		authRequest.useBasicAuthorization = false;
-		AccessTokenResponse authResponse  = authRequest.execute();
+		
+		AccessTokenResponse authResponse  = null;
+		try {
+			authResponse = authRequest.execute();
+		} catch (HttpResponseException e) {
+			Log.e(TAG, "Error authorizing request: " + e.response.parseAsString());
+			throw e;
+		}
 		oauthConfig.setOauthAccessToken(authResponse.accessToken);
 		oauthConfig.setOauthRefreshToken(authResponse.refreshToken);
 	}
@@ -94,7 +103,8 @@ public class YouTubeClient {
 		} catch (HttpResponseException e) {
 			// TODO: better error handling
 			Log.e(TAG, "An error occurred retrieving profile from Youtube", e);
-			System.err.println(e.response.parseAsString());
+			
+			Log.d(TAG, "Error response text: " + e.response.parseAsString());
 			return null;
 		}
 	}

@@ -18,17 +18,10 @@ public class AuthActivity extends Activity {
 	
 	WebView webView;
 	
-	String oauthClientId;
-	String oauthClientSecret;
-	String oauthRedirectUri;
-	
-	String oauthCode;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.auth_main);
-		readOAuthConfig();
 		
 		// the base URI - http://www.google.com/blah/blah/blah -- no query params
 		/*Uri authBaseUri = Uri.parse(getString(R.string.oauth_auth_request_url));
@@ -39,33 +32,28 @@ public class AuthActivity extends Activity {
 		*/
 		webView = (WebView)findViewById(R.id.auth_web_view);
 		
-		String authorizeUrl = new GoogleAuthorizationRequestUrl(oauthClientId, oauthRedirectUri, YOUTUBE_SCOPE).build();		 
+		final OAuthConfig oauthConfig = OAuthConfig.getInstance(this);
+		
+		String authorizeUrl = new GoogleAuthorizationRequestUrl(oauthConfig.getOauthClientId(), oauthConfig.getOauthRedirectUri(), YOUTUBE_SCOPE).build();		 
 		webView.loadUrl(authorizeUrl);
 		
 		webView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageStarted(WebView view, String url, Bitmap favicon) {
-				if (url.startsWith(oauthRedirectUri) && null == oauthCode) {
+				if (url.startsWith(oauthConfig.getOauthRedirectUri()) && null == oauthConfig.getOauthAuthorizationCode()) {
 					Uri redirectUri = Uri.parse(url);
 					webView.stopLoading();
+					
+					// update the oauth config with the authorization code
+					OAuthConfig.getInstance(AuthActivity.this).setOauthAuthorizationCode(redirectUri.getQueryParameter("code"));
+					
+					// then return 'OK'!
 					Intent result = new Intent();
-					result.putExtra(OAuthConfig.class.getCanonicalName(), new OAuthConfig(
-						oauthClientId,
-						oauthClientSecret,
-						oauthRedirectUri,
-						redirectUri.getQueryParameter("code")
-					));
 					setResult(Activity.RESULT_OK, result);
 					finish();
 				}
 			}
 		});
-	}
-	
-	private void readOAuthConfig() {
-		oauthClientId = getString(R.string.oauth_clientId);
-		oauthClientSecret = getString(R.string.oauth_secret);
-		oauthRedirectUri = getString(R.string.oauth_redirect_uri);
 	}
 	
 }

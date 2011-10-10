@@ -30,11 +30,8 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.freefallhighscore.android.youtube.OAuthConfig;
 
 
 public class MainScreen extends Activity implements SurfaceHolder.Callback, SensorEventListener, OnClickListener {
@@ -75,8 +72,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	View drawer; 
 	ImageView leftStripes, rightStripes, centerStripes;
 	Animation rotate;
-
-	private OAuthConfig oauthConfig;
 
 	// Accelerometer
 	SensorManager sensorManager;
@@ -345,6 +340,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		// need be.
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 		
+		// TODO: we probably shouldn't be re-init-ing the recorder here
+		// unless we actually want the camera to be on (if we were on
+		// the submit page, we don't)
+		
+		// TODO FIXME XXX calling initRecorder here overwrites a pre-existing video
+		// with an empty file. To repro: record a drop, go to the submit page, click 'back',
+		// click 'submit' again and upload. It will be 0-byte file. 
+		
 		// Camera Init
 		recorder = new MediaRecorder();
 		initRecorder();
@@ -367,15 +370,12 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		switch (requestCode) {
 		case AUTH_REQ:
 			if (resultCode == Activity.RESULT_OK) {
-				oauthConfig = (OAuthConfig)data.getSerializableExtra(OAuthConfig.class.getCanonicalName());
 				Toast.makeText(this, "You are now authed.", Toast.LENGTH_LONG);
 				loginBtn.setVisibility(View.GONE);
 			}
 			break;
 		case UPLOAD_VIDEO:
 			if (resultCode == Activity.RESULT_OK) {
-				oauthConfig = (OAuthConfig)data.getSerializableExtra(OAuthConfig.class.getCanonicalName());
-				
 				// TODO: show success message here instead of the 'just opened' state
 				changeState(GameState.kFFStateJustOpened);
 				
@@ -719,7 +719,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	public void submitClip(View view){
 		Intent i = new Intent(getApplicationContext(), UploadActivity.class);
 		i.putExtra("videoFileName", getVideoFilePath());
-		i.putExtra(OAuthConfig.class.getCanonicalName(), oauthConfig);
 		startActivityForResult(i, UPLOAD_VIDEO);
 	}
 	

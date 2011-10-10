@@ -30,7 +30,6 @@ public class UploadActivity extends Activity implements OnClickListener {
 
 	private static final String TAG = "VIDEOCAPTURE";
 
-	OAuthConfig oauthConfig;
 	String videoFileName;
 	
 	Button backButton;
@@ -51,14 +50,17 @@ public class UploadActivity extends Activity implements OnClickListener {
 		// TODO: better way of persisting thing. Probably Application object
 		// TODO: should these two guys be in onResume() instead?
 		Intent creator = getIntent();
-		oauthConfig = (OAuthConfig)creator.getSerializableExtra(OAuthConfig.class.getCanonicalName());
 		videoFileName = creator.getStringExtra("videoFileName");
 		
 		
 		setupViewReferences();
 		setOnClickListers(backButton, loginLogoutButton, uploadButton);
 		
-		updateLoginLogoutButtonDisplay();		
+		updateLoginLogoutButtonDisplay();
+		
+		if (OAuthConfig.getInstance(this).isAuthorized()) {
+			lookUpUserName();
+		}
 	}
 
 	private void setupViewReferences() {
@@ -95,13 +97,13 @@ public class UploadActivity extends Activity implements OnClickListener {
 	}
 
 	private void handleLoginLogoutPress() {
-		if (null == oauthConfig) {
+		if (!OAuthConfig.getInstance(this).isAuthorized()) {
 			// if we're not logged in, let's go log in. And come back here
 			startActivityForResult(new Intent(this, AuthActivity.class), AUTH_REQ);
 		} else {
 			// otherwise log out.
 			// TODO: is there anything else that needs to be done here?
-			oauthConfig = null;
+			OAuthConfig.getInstance(this).reset();
 			updateLoginLogoutButtonDisplay();
 		}
 	}
@@ -134,7 +136,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 		uploadProgress.setMax(Long.valueOf(f.length()).intValue());
 		
 		VideoUploadTask uploadRunnable = new VideoUploadTask(
-				title, desc, videoFileName, getString(R.string.devId), oauthConfig);
+				title, desc, videoFileName, getString(R.string.devId), OAuthConfig.getInstance(this));
 		
 		videoTitleInput.setEnabled(false);
 		videoDescInput.setEnabled(false);
@@ -208,11 +210,6 @@ public class UploadActivity extends Activity implements OnClickListener {
 						
 						Intent result = new Intent();
 						// TODO: any other data we want to put here?
-						
-						// guaranteed that OAuthConfig is non-null here. Let's pass that
-						// login info back to the main screen.
-						result.putExtra(OAuthConfig.class.getCanonicalName(), oauthConfig);
-						
 						setResult(Activity.RESULT_OK, result);
 						finish();
 					}
@@ -253,19 +250,22 @@ public class UploadActivity extends Activity implements OnClickListener {
 		switch (requestCode) {
 		case AUTH_REQ:
 			if (resultCode == Activity.RESULT_OK) {
-				oauthConfig = (OAuthConfig)data.getSerializableExtra(OAuthConfig.class.getCanonicalName());
 				updateLoginLogoutButtonDisplay();
 				Toast.makeText(this, "You are now authed.", Toast.LENGTH_LONG);
 				
-				loginLogoutButton.setText("working...");
-				loginLogoutButton.setEnabled(false);
-				
-				new Thread(new RetrieveYouTubeProfile()).start();
+				lookUpUserName();
 				
 			}
 			break;
 		}
 		
+	}
+	
+	private void lookUpUserName() {
+		loginLogoutButton.setText("working...");
+		loginLogoutButton.setEnabled(false);
+		
+		new Thread(new RetrieveYouTubeProfile()).start();
 	}
 	
 	private class RetrieveYouTubeProfile implements Runnable {
@@ -275,7 +275,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 				// TODO: this should probably be trigger by authactivity returning. but that makes things more complicated,
 				// so this will do for now. We should also check whether or not we have the username when we first load
 				// this activity
-				YouTubeClient client = YouTubeClient.buildAuthorizedClient(oauthConfig, getString(R.string.devId));
+				YouTubeClient client = YouTubeClient.buildAuthorizedClient(OAuthConfig.getInstance(UploadActivity.this), getString(R.string.devId));
 				YouTubeProfile profile = client.getYouTubeProfile();
 				Log.d(TAG, profile.username);
 				
@@ -290,7 +290,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 					}
 				});
 			} catch (IOException e) {
-				Log.e(TAG, "Erro", e);
+				Log.e(TAG, "Error", e);
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -304,7 +304,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 	}
 	
 	private void updateLoginLogoutButtonDisplay() {
-		if (null == oauthConfig) {
+		if (!OAuthConfig.getInstance(this).isAuthorized()) {
 			loginLogoutButton.setText("Login");
 			// prevent upload if we're not logged in
 			uploadButton.setText("Log in to upload");
