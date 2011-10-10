@@ -18,20 +18,28 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.http.xml.atom.AtomParser;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson.JacksonFactory;
+import com.google.api.client.xml.XmlNamespaceDictionary;
 
 // based on:
 // http://code.google.com/p/google-api-java-client/source/browse/youtube-jsonc-sample/src/main/java/com/google/api/client/sample/youtube/YouTubeClient.java?repo=samples
 public class YouTubeClient {
 	
+	static final XmlNamespaceDictionary DICTIONARY = new XmlNamespaceDictionary()
+		.set("", "http://www.w3.org/2005/Atom")
+		.set("media", "http://search.yahoo.com/mrss/")
+		.set("batch", "http://schemas.google.com/gdata/batch")
+		.set("yt", "http://gdata.youtube.com/schemas/2007")
+		.set("gd", "http://schemas.google.com/g/2005");
+	
 	private static final String TAG = "VIDEOCAPTURE";
 
-	private final JsonFactory jsonFactory = new JacksonFactory();
-	
+	private final JsonFactory jsonFactory;
 	private final HttpTransport transport;
-
-	private HttpRequestFactory requestFactory;
+	private final HttpRequestFactory requestFactory;
 	
 	/**
 	 * @param transport the transport that's going to send data
@@ -39,14 +47,31 @@ public class YouTubeClient {
 	 * @param authHeaderValue the Authorization header value
 	 */
 	private YouTubeClient(YouTubeProtectedResource requestInitializer) {
+		this.jsonFactory = requestInitializer.getJsonFactory();
 		this.transport = requestInitializer.getTransport();
-		final JsonCParser parser = new JsonCParser();
-		parser.jsonFactory = jsonFactory;
 		requestFactory = this.transport.createRequestFactory(requestInitializer);
 	}
 	
-	public static YouTubeClient buildAuthorizedClient(HttpTransport transport, JsonFactory jsonFactory, OAuthConfig oauthConfig, String devId) throws IOException {
-		// TODO: maybe full this first part out
+	public static YouTubeClient buildAuthorizedClient(OAuthConfig oauthConfig, String devId) throws IOException {
+		
+		HttpTransport transport = new NetHttpTransport();
+		JsonFactory jsonFactory = new JacksonFactory();
+		
+		if (null == oauthConfig.getOauthAccessToken()) {
+			// if we dont have any access token, we need to authorize
+			authorizeAndUpdateOAuth(transport, jsonFactory, oauthConfig);
+		}
+		
+		YouTubeProtectedResource initializer = new YouTubeProtectedResource( 
+				transport, 
+				jsonFactory, 
+				oauthConfig, 
+				devId);
+		
+		return new YouTubeClient(initializer);
+	}
+	
+	private static void authorizeAndUpdateOAuth(HttpTransport transport, JsonFactory jsonFactory, OAuthConfig oauthConfig) throws IOException {
 		GoogleAuthorizationCodeGrant authRequest = new GoogleAuthorizationCodeGrant(transport,
 				jsonFactory, oauthConfig.getOauthClientId(), oauthConfig.getOauthClientSecret(),
 				oauthConfig.getOauthAuthorizationCode(), oauthConfig.getOauthRedirectUri());
@@ -54,21 +79,24 @@ public class YouTubeClient {
 		AccessTokenResponse authResponse  = authRequest.execute();
 		oauthConfig.setOauthAccessToken(authResponse.accessToken);
 		oauthConfig.setOauthRefreshToken(authResponse.refreshToken);
-		
-		YouTubeProtectedResource initializer = new YouTubeProtectedResource(
-				oauthConfig.getOauthAccessToken(), 
-				transport, 
-				jsonFactory, 
-				oauthConfig.getOauthClientId(), 
-				oauthConfig.getOauthClientSecret(), 
-				oauthConfig.getOauthRefreshToken(), 
-				devId);
-		
-		return new YouTubeClient(initializer);
 	}
 	
-	public boolean authorize() throws IOException {
-		return false;
+	public YouTubeProfile getYouTubeProfile() throws IOException {
+		YouTubeUrl url = YouTubeUrl.forProfile();
+		
+		HttpRequest request = requestFactory.buildGetRequest(url);
+		// blech... because YouTubeProtectedResource extends GoogleAccessProtectedResource and that class
+		// make initialize final... we have to set up the stupid headers here
+		request.headers = new GoogleHeaders();
+		try {
+			HttpResponse resp = request.execute();
+			return resp.parseAs(YouTubeProfile.class);
+		} catch (HttpResponseException e) {
+			// TODO: better error handling
+			Log.e(TAG, "An error occurred retrieving profile from Youtube", e);
+			System.err.println(e.response.parseAsString());
+			return null;
+		}
 	}
 	
 	public String executeUpload(UploadRequestData data, ByteWrittenListener writeListener) throws IOException {
@@ -137,12 +165,12 @@ public class YouTubeClient {
 	private static class YouTubeProtectedResource extends GoogleAccessProtectedResource {
 		
 		private final String devId;
+		private final OAuthConfig oauthConfig;
 
-		public YouTubeProtectedResource(String accessToken,
-				HttpTransport transport, JsonFactory jsonFactory,
-				String clientId, String clientSecret, String refreshToken, String devId) {
-			super(accessToken, transport, jsonFactory, clientId, clientSecret, refreshToken);
+		public YouTubeProtectedResource(HttpTransport transport, JsonFactory jsonFactory, OAuthConfig oauthConfig, String devId) {
+			super(oauthConfig.getOauthAccessToken(), transport, jsonFactory, oauthConfig.getOauthClientId(), oauthConfig.getOauthClientSecret(), oauthConfig.getOauthRefreshToken());
 			this.devId = devId;
+			this.oauthConfig = oauthConfig;
 		}
 		
 		// AccessProtectedResource makes initialize() final, so we're taking advantage
@@ -156,6 +184,14 @@ public class YouTubeClient {
 			headers.gdataVersion = "2";
 			headers.setDeveloperId(devId);
 			request.headers = headers;
+			
+			// seems like the JSON parser is added by default, but getting
+			// the profile uses Atom. It's also a little weird to add the
+			// response parser on the request, but that's how it works
+			final AtomParser atomParser = new AtomParser();
+			atomParser.namespaceDictionary = DICTIONARY;
+			request.addParser(atomParser);
+			
 			// let the superclass do its business
 			super.intercept(request);
 		}

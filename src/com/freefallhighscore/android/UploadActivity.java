@@ -21,10 +21,7 @@ import com.freefallhighscore.android.youtube.ByteWrittenListener;
 import com.freefallhighscore.android.youtube.OAuthConfig;
 import com.freefallhighscore.android.youtube.UploadRequestData;
 import com.freefallhighscore.android.youtube.YouTubeClient;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson.JacksonFactory;
+import com.freefallhighscore.android.youtube.YouTubeProfile;
 import com.google.common.base.Strings;
 
 public class UploadActivity extends Activity implements OnClickListener {
@@ -175,11 +172,9 @@ public class UploadActivity extends Activity implements OnClickListener {
 		public void run() {
 			
 			boolean errorOccurred = false;
-			
-			HttpTransport transport = new NetHttpTransport();
-			JsonFactory jsonFactory = new JacksonFactory();
+
 			try {
-				YouTubeClient client = YouTubeClient.buildAuthorizedClient(transport, jsonFactory, oauthConfig, devId);
+				YouTubeClient client = YouTubeClient.buildAuthorizedClient(oauthConfig, devId);
 				
 				File videoFile = new File(fileName);
 				Log.d(TAG, "File name: " + videoFile.getAbsolutePath());
@@ -261,10 +256,51 @@ public class UploadActivity extends Activity implements OnClickListener {
 				oauthConfig = (OAuthConfig)data.getSerializableExtra(OAuthConfig.class.getCanonicalName());
 				updateLoginLogoutButtonDisplay();
 				Toast.makeText(this, "You are now authed.", Toast.LENGTH_LONG);
+				
+				loginLogoutButton.setText("working...");
+				loginLogoutButton.setEnabled(false);
+				
+				new Thread(new RetrieveYouTubeProfile()).start();
+				
 			}
 			break;
 		}
 		
+	}
+	
+	private class RetrieveYouTubeProfile implements Runnable {
+		@Override
+		public void run() {
+			try {
+				// TODO: this should probably be trigger by authactivity returning. but that makes things more complicated,
+				// so this will do for now. We should also check whether or not we have the username when we first load
+				// this activity
+				YouTubeClient client = YouTubeClient.buildAuthorizedClient(oauthConfig, getString(R.string.devId));
+				YouTubeProfile profile = client.getYouTubeProfile();
+				Log.d(TAG, profile.username);
+				
+				final String userName = profile.username;
+				// TODO: maybe store the username in whatever global storage we settle on
+				
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						loginLogoutButton.setText(userName);
+						loginLogoutButton.setEnabled(true);
+					}
+				});
+			} catch (IOException e) {
+				Log.e(TAG, "Erro", e);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						loginLogoutButton.setEnabled(true);
+						updateLoginLogoutButtonDisplay();
+					}
+				});
+			}
+		}
+
 	}
 	
 	private void updateLoginLogoutButtonDisplay() {

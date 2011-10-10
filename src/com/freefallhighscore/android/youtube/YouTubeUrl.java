@@ -7,16 +7,13 @@ import com.google.api.client.googleapis.GoogleUrl;
 public class YouTubeUrl extends GoogleUrl {
 	
 	static final String UPLOAD_ROOT = 
-		/*"https://gdata.youtube.com/feeds/api/videos?" +
-		"q=GoogleDevelopers" + 
-	    "&max-results=1" + 
-	    "&v=2" + 
-	    "&alt=jsonc";*/
 	    "http://uploads.gdata.youtube.com/resumable/feeds/api/users/default/uploads?alt=jsonc&v=2";
 	
-		// TODO FIXME uploads URL doesn't work. 404s. weird.
-	
-	static final String LOGIN_ROOT = ""; 
+	/*"https://gdata.youtube.com/feeds/api/videos?" +
+	"q=GoogleDevelopers" + 
+    "&max-results=1" + 
+    "&v=2" + 
+    "&alt=jsonc";*/ 
 	
 	YouTubeUrl(String encodedUrl) {
 		super(encodedUrl);
@@ -31,6 +28,12 @@ public class YouTubeUrl extends GoogleUrl {
 	 */
 	public static YouTubeUrl forUploadRequest() {
 		YouTubeUrl url = new YouTubeUrl(UPLOAD_ROOT);
+		return url;
+	}
+	
+	public static YouTubeUrl forProfile() {
+		// why no 'alt=jsonc'? Because profiles don't support it. Lame.
+		YouTubeUrl url = new YouTubeUrl("https://gdata.youtube.com/feeds/api/users/default?v=2");
 		return url;
 	}
 	
