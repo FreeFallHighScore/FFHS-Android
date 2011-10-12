@@ -153,7 +153,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		state = GameState.kFFStateJustOpened;
 		currentDrawerLevel = 0.0f;
 		
-		freefallDuration = 1.646f; //fake duration
+		freefallDuration = 1142; //fake duration
 		
 		changeState(GameState.kFFStateReadyToDrop);
 	}
@@ -506,12 +506,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				revealElementFromTop(scoreText);
 				
 				//TODO: populate score text accurately
-				
+				scoreText.setText("" + (freefallDuration / 1000.0) + "s" );
 				showStripes();
 				bringDrawerToLevel(.2f);
+				
 				submitBtn.setVisibility(View.VISIBLE);
 				replayBtn.setVisibility(View.VISIBLE);
 				deleteBtn.setVisibility(View.VISIBLE);
+				
 				revealFromLeft(submitBtn);
 				revealFromLeft(replayBtn);
 				revealFromRight(deleteBtn);
@@ -676,7 +678,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		Log.i("RECORD_TAGS", "RECORDING FINISHED");
 		
 		recorder.stop();
-		recorder.release();
+		//recorder.release();
 		recording = false;
 
 		playbackClip();
@@ -745,7 +747,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	
 	public void deleteClip(View view){
 		//TODO: delete clip
-		recorder.reset();
 		initRecorder();
 		prepareRecorder();
 		changeState(GameState.kFFStateReadyToDrop);
@@ -754,6 +755,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	public void submitClip(View view){
 		Intent i = new Intent(getApplicationContext(), UploadActivity.class);
 		i.putExtra("videoFileName", getVideoFilePath());
+		i.putExtra("freefallDuration", freefallDuration);
 		startActivityForResult(i, UPLOAD_VIDEO);
 	}
 	
@@ -772,5 +774,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		changeState(GameState.kFFStateReadyToDrop);
 	}
 	
+	
+	//accel
+	public void onAccelerationChanged(float x, float y, float z){
+		Log.i("ACCEL", "x:" + x + "y:" + y + "z:" + z);
+	}
 	
 }

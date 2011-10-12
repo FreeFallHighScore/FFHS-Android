@@ -30,7 +30,9 @@ public class UploadActivity extends Activity implements OnClickListener {
 
 	private static final String TAG = "VIDEOCAPTURE";
 
+	//extras set by MainScreen Activity
 	String videoFileName;
+	double freefallDuration;
 	
 	Button backButton;
 	TextView fallDurationText;
@@ -136,7 +138,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 		uploadProgress.setMax(Long.valueOf(f.length()).intValue());
 		
 		VideoUploadTask uploadRunnable = new VideoUploadTask(
-				title, desc, videoFileName, getString(R.string.devId), OAuthConfig.getInstance(this));
+				title, desc, videoFileName, getString(R.string.devId), OAuthConfig.getInstance(this), freefallDuration);
 		
 		videoTitleInput.setEnabled(false);
 		videoDescInput.setEnabled(false);
@@ -158,16 +160,22 @@ public class UploadActivity extends Activity implements OnClickListener {
 		private String desc;
 		private String fileName;
 		private String devId;
+		
+		//dev tag keys
+		private double score;
+		
 		private OAuthConfig oauthConfig;
 		
 		public VideoUploadTask(String title, String desc, String fileName,
-				String devId, OAuthConfig oauthConfig) {
+				String devId, OAuthConfig oauthConfig, double score) {
 			super();
 			this.title = title;
 			this.desc = desc;
+			this.score = freefallDuration;
 			this.fileName = fileName;
 			this.devId = devId;
 			this.oauthConfig = oauthConfig;
+			this.score = score;
 		}
 
 		@Override
@@ -190,6 +198,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 				data.description = this.desc;
 				data.fileName = URLEncoder.encode(videoFile.getName(), "UTF-8");
 				data.fileData = new FileInputStream(videoFile);
+				
 				client.executeUpload(data, this);
 				
 				runOnUiThread(new Runnable() {
