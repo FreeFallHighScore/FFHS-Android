@@ -39,28 +39,40 @@
 	     android:scaleType="matrix"
      	/>
      	
-     	
+   
   
-   	<!--  DRAWER -->	         	
+   	<!--  DRAWER -->
+   	<!-- 	         	
      <ImageView
      	android:id="@+id/drawer"
 		android:layout_height="wrap_content"
-	    android:layout_width="wrap_content"
-	    android:layout_toRightOf="@id/left"
+	    android:layout_width="260dip"
+	    android:paddingLeft= "20dip"
+	    android:layout_alignParentLeft="true"
         android:src="@drawable/overlay_white"
 	    android:scaleType="matrix"
      />
-    
+     -->
+     <View
+     	android:id="@+id/drawer"
+		android:layout_height="wrap_content"
+	    android:layout_width="240dip"
+	    android:layout_marginLeft="20dip"
+	    android:layout_alignParentLeft="true"
+        android:background="#80FFFFFF"
+	    android:scaleType="matrix"
+     />
+     
     <!-- BLACK LOGO -->
     <ImageView
 	     android:id="@+id/mainLogo"
 	     android:layout_height="wrap_content"
 	     android:layout_width="wrap_content"
 	     android:src="@drawable/logo_black"
-	     android:layout_toRightOf="@id/left"
+	     android:layout_alignParentLeft="true"
 	     android:scaleType="matrix"
-	     android:paddingTop="20dip"
-	     android:paddingLeft= "30dip"
+	     android:paddingTop="35dip"
+	     android:paddingLeft="60dip"
      	/> 
      	
     <!-- WHITE LOGO -->
@@ -175,7 +187,7 @@
 	    android:text="GO FOR IT!"
    		android:textColor="#FFFFFF"
    		android:background="#000000"
-   		android:textSize="28sp"
+   		android:textSize="25sp"
    		android:layout_marginTop="20dip"
 		android:layout_marginLeft="40dip"
 		android:padding="5dip"
@@ -278,9 +290,9 @@
 	    android:text="SUCCESS!"
    		android:textColor="#FFFFFF"
    		android:background="#000000"
-   		android:textSize="28sp"
-   		android:layout_marginTop="40dip"
-		android:layout_marginLeft="60dip"
+   		android:textSize="25sp"
+   		android:layout_marginTop="20dip"
+		android:layout_marginLeft="40dip"
 		android:padding="5dip"
 		android:visibility="gone"	
    	/>

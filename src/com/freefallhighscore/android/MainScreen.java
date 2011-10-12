@@ -363,13 +363,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	public void bringDrawerToLevel(float newLevel){
 		slideDirection = newLevel > currentDrawerLevel ? -1 : 1;
-		//slideTarget  = (int) (10000.0 - newLevel*7500.0);
-		//Log.i("State", "target: " +slideTarget);
+	
 		slideOrigin = drawable.getLevel();
 		slideDistance = Math.abs(slideTarget-slideOrigin);
-		
-		//mHandler.removeCallbacks(mUpdateTimeTask);  //Remove old timer
-		//mHandler.postDelayed(mUpdateTimeTask, 100); //How fast thread updated
 		
 		TranslateAnimation slide = new TranslateAnimation(
 				Animation.RELATIVE_TO_PARENT,  0.0f,
@@ -380,7 +376,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		slide.setDuration(250);
 		slide.setFillAfter(true);
 
-		// AnimationSet animations = new AnimationSet(true); 
 		drawer.startAnimation(slide);
 		currentDrawerLevel = newLevel;
 	}
@@ -536,23 +531,18 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				else{
 					hideToLeft(loginBtn);
 					hideToRight(sideLogo);
-				}
-				
+				}				
 				hideElementToTop(startBtn);
 				
-				bringDrawerToLevel(.3f);
+				bringDrawerToLevel(.25f);
 				
 				cancelBtn.setVisibility(View.VISIBLE);
-				
-				//slide(cancelBtn,100,0,0,0,1000);
 				revealFromRight(cancelBtn);
 				
 				go.setVisibility(View.VISIBLE);
-				//slide(go,0,0,-100,0,1000);
 				revealElementFromTop(go);
 				
 				record.setVisibility(View.VISIBLE);
-				//slide(record,0,0,-100,0,1000);
 				revealElementFromTop(record);
 				
 				hideStripes();
@@ -594,7 +584,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				//TODO: populate score text accurately
 				scoreText.setText("" + (freefallDuration / 1000.0) + "s" );
 				showStripes();
-				bringDrawerToLevel(.2f);
+				bringDrawerToLevel(.25f);
 				
 				submitBtn.setVisibility(View.VISIBLE);
 				replayBtn.setVisibility(View.VISIBLE);
@@ -615,7 +605,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				hideToLeft(replayBtn);
 				hideToRight(deleteBtn);
 				
-				bringDrawerToLevel(.2f);
+				bringDrawerToLevel(.25f);
 				
 				playAgainBtn.setVisibility(View.VISIBLE);
 				successText.setVisibility(View.VISIBLE);

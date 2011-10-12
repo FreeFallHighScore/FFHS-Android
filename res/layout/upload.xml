@@ -22,13 +22,12 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="0.5"
-	   		android:textColor="#000000"
-	   		android:background="#FFFFFF"
-	   		android:textSize="25sp"
+	   		android:textColor="#FFFFFF"
+	   		android:background="#000000"
+	   		android:textSize="28sp"
 	   		android:layout_marginTop="8dip"
-			android:layout_marginLeft="30dip"
+			android:layout_marginLeft="20dip"
 			android:padding="5dip"
-			
 			android:text="1.254s" />
 	
 		<Button
