@@ -858,7 +858,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
                 	fallEnded();
                 }
                 
-                Log.i("ACCEL", "FALLING delta force: " + deltaForce + " distance accum " + distanceAccum + " / " + kFFFallTimeThreshold);
+                Log.i("ACCEL", "FALLING delta force: " + deltaForce + " distance accum " + distanceAccum + " / " + kFFImpactThreshold);
 
             }
 		}
