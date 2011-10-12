@@ -11,9 +11,11 @@ public class UploadRequestData {
 	@Key public String privacy = "public";
 	
 	// required
-	@Key public List<String> category = Lists.newArrayList("Sports", "freefallhighscore");
+	@Key public String category = "Sports";
 	@Key public String description;
-	@Key public List<String> tags = Lists.newArrayList();
+	
+	@Key public List<String> tags = Lists.newArrayList("freefallhighscore");
+	@Key public List<String> developerTags = Lists.newArrayList("freefallhighscore");
 	
 	// date, e.g.: 2011-08-11
 	@Key public String recorded;
