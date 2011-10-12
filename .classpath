@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="lib/google-api-client-1.4.1-beta.jar"/>
+	<classpathentry kind="lib" path="lib/google-api-client-1.4.1-beta.jar" sourcepath="/Users/robert/code/android/youtube-test/lib/google-api-client-1.4.1-beta-sources.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-client-extensions-android2-1.4.1-beta.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-client-googleapis-1.4.1-beta.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-client-googleapis-extensions-android2-1.4.1-beta.jar"/>
