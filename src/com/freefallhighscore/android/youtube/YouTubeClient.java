@@ -33,11 +33,7 @@ public class YouTubeClient {
 		.set("media", "http://search.yahoo.com/mrss/")
 		.set("batch", "http://schemas.google.com/gdata/batch")
 		.set("yt", "http://gdata.youtube.com/schemas/2007")
-		.set("gd", "http://schemas.google.com/g/2005")
-		.set("georss", "http://www.georss.org/georss") // GeoRSS
-        .set("gml", "http://www.opengis.net/gml") // Geography Markup Language
-        .set("app", "http://www.w3.org/2007/app") // Atom Publishing Protocol
-        .set("batch", "http://schemas.google.com/gdata/batch"); // Google Data API Batch Processing
+		.set("gd", "http://schemas.google.com/g/2005");
 	
 	private static final String TAG = "VIDEOCAPTURE";
 

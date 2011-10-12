@@ -32,7 +32,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 
 	//extras set by MainScreen Activity
 	String videoFileName;
-	double freefallDuration;
+	long freefallDuration;
 	
 	Button backButton;
 	TextView fallDurationText;
@@ -53,6 +53,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 		// TODO: should these two guys be in onResume() instead?
 		Intent creator = getIntent();
 		videoFileName = creator.getStringExtra("videoFileName");
+		freefallDuration = creator.getIntExtra("freefallDuration", 0);
 		
 		
 		setupViewReferences();
@@ -162,12 +163,12 @@ public class UploadActivity extends Activity implements OnClickListener {
 		private String devId;
 		
 		//dev tag keys
-		private double score;
+		private long score;
 		
 		private OAuthConfig oauthConfig;
 		
 		public VideoUploadTask(String title, String desc, String fileName,
-				String devId, OAuthConfig oauthConfig, double score) {
+				String devId, OAuthConfig oauthConfig, long score) {
 			super();
 			this.title = title;
 			this.desc = desc;
@@ -193,8 +194,11 @@ public class UploadActivity extends Activity implements OnClickListener {
 				UploadRequestData data = new UploadRequestData();
 				data.title = this.title;
 				
-				// TODO: what category should this be?
-				// 	data.category = "freefallhighscore";
+				data.developerTags.add("dur:" + score);
+				data.developerTags.add("mak:Android");
+				
+				// TODO: more tags like this ^
+				
 				data.description = this.desc;
 				data.fileName = URLEncoder.encode(videoFile.getName(), "UTF-8");
 				data.fileData = new FileInputStream(videoFile);
