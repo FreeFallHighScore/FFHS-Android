@@ -355,7 +355,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		
 		// register the accelerometer. Let's get lots of updates. We can tone it down if
 		// need be.
-		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
 		
 		//Log.i("ACCEL", "Turning on ACCEL");
 		
@@ -794,9 +794,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	protected Accel lastAccel;
 
 	protected static final float kFFFallTimeThreshold = .12f * 1000.0f;
-	protected static final float kFFFallStartMinForceThreshold  = 0.347f;
+	protected static final float kFFFallStartMinForceThreshold  = 0.347f * SensorManager.GRAVITY_EARTH;
 	protected static final float kFFDistanceDecay = 1.33f;
-	protected static final float kFFImpactThreshold  = 6.34f;
+	protected static final float kFFImpactThreshold  = 6.34f * SensorManager.GRAVITY_EARTH;
 	protected static final long kRecordingTimeout = 20 * 1000;
 	
 	@Override
@@ -806,7 +806,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		Accel a = new Accel(event.values, event.timestamp);
 
 		if(this.lastAccel != null){
-			Log.i("ACCEL", "rate " + (a.t - lastAccel.t) / 1000000.0f  );
+			//Log.i("ACCEL", "rate " + 1000 / (a.t - lastAccel.t) / 1000000.0f  );
 			double accelMagnitude = Math.sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
 			if(state == GameState.kFFStatePreDropRecording){
 				
@@ -831,8 +831,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			        	//Log.i("ACCEL", "Above THRESHOLD" + ( (a.t - startTimestampOfDrop)  / kFFFallTimeThreshold )  );
 			        }
 			    	belowThreshold = false;
-					
-
 			    }
 	
 			   //TEST FOR TIMEOUT
@@ -849,15 +847,18 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
                 float dZ = this.lastAccel.z - a.z;
                 
                 double deltaForce = Math.sqrt(dX*dX + dY*dY + dZ*dZ);
-
+                
                 distanceAccum += deltaForce;
                 float deltaT = a.t - this.lastAccel.t;
                 distanceAccum -= deltaT*kFFDistanceDecay;
                 distanceAccum = Math.max(0, distanceAccum);
                 if(distanceAccum > kFFImpactThreshold){
-                    freefallDuration = a.t - startTimestampOfDrop;
+                    freefallDuration = (a.t - startTimestampOfDrop)/1000000;
                     finishRecording();
                 }
+                
+                Log.i("ACCEL", "FALLING delta force: " + deltaForce + " distance accum " + distanceAccum + " / " + kFFFallTimeThreshold);
+
             }
 		}
 		this.lastAccel = a;
