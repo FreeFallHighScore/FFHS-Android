@@ -267,5 +267,39 @@
 		android:paddingTop="5dip"
 		android:onClick="deleteClip"
 		android:visibility="gone"
-	    />
+	/>
+	    
+	<!--  SUCCESS! -->
+	<TextView  
+	   	android:id="@+id/success"
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
+	    android:text="SUCCESS!"
+   		android:textColor="#FFFFFF"
+   		android:background="#000000"
+   		android:textSize="28sp"
+   		android:layout_marginTop="40dip"
+		android:layout_marginLeft="60dip"
+		android:padding="5dip"
+		android:visibility="gone"	
+   	/>
+   	
+   	 <!--  CANCEL BUTTON -->   
+	 <Button
+		android:id="@+id/playagain"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="PLAY AGAIN"
+		android:textSize="30dip"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="20dip"
+		android:background="@drawable/delete_btn"
+		android:gravity="top|center_horizontal"
+		android:paddingLeft="45dip"
+		android:paddingTop="5dip"
+		android:onClick="playAgain"
+		android:visibility="gone"
+	   />
+	   	
 </RelativeLayout>

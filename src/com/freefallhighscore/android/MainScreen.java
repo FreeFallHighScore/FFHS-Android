@@ -49,22 +49,24 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	    //kFFStateFinishedDropVideoPlaybackFirstLoop,
 	    kFFStateFinishedDropVideoPlayback,
 	    kFFStateFinishedDropScoreView,
+	    kFFStateFinishedUpload
 	};
 
 	protected GameState state; 
 	
 	private static final int AUTH_REQ = 1;
 	private static final int UPLOAD_VIDEO = 2;
+	private static final int CANCEL_UPLOAD = 3;
 	
 	protected float currentDrawerLevel;
 	protected float freefallDuration;
 	
 	ClipDrawable drawable;
 	private Handler mHandler = new Handler();
-	protected TextView go, scoreText;
+	protected TextView go, scoreText, successText;
 	int slideDirection, slideTarget, slideOrigin, slideDistance;
 	Button whatBtn, loginBtn, startBtn, cancelBtn, tempStartFall, tempStopFall;
-	Button submitBtn, replayBtn, deleteBtn;
+	Button submitBtn, replayBtn, deleteBtn, playAgainBtn;
 	
 	ImageView logo, logoWhite, logoBlack, circle, record;
 	
@@ -125,6 +127,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		submitBtn	= (Button) findViewById(R.id.submit);
 		replayBtn	= (Button) findViewById(R.id.replay);
 		deleteBtn	= (Button) findViewById(R.id.delete);
+		
+		playAgainBtn = (Button) findViewById(R.id.playagain);
+		successText = (TextView) findViewById(R.id.success);
 		
 		// temporary buttons - to be replaced by accelerometer business
 		tempStartFall = (Button) findViewById(R.id.tempStartFall); 
@@ -336,6 +341,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	protected void onResume(){
 		super.onResume();
 		Log.d(TAG, "RESUMING MainScreen");
+		
 		// register the accelerometer. Let's get lots of updates. We can tone it down if
 		// need be.
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
@@ -348,10 +354,11 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		// with an empty file. To repro: record a drop, go to the submit page, click 'back',
 		// click 'submit' again and upload. It will be 0-byte file. 
 		
-		// Camera Init
-		recorder = new MediaRecorder();
-		initRecorder();
-		
+		if(state != GameState.kFFStateFinishedDropScoreView){
+			recorder = new MediaRecorder();
+			// Camera Init
+			initRecorder();
+		}
 	}
 
 	protected void onPause() {
@@ -359,7 +366,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 		// make sure to always unregister the sensor...
 		sensorManager.unregisterListener(this);
-
+		
+		//and release the recorder
 		recorder.release();
 	}
 
@@ -371,13 +379,15 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		case AUTH_REQ:
 			if (resultCode == Activity.RESULT_OK) {
 				Toast.makeText(this, "You are now authed.", Toast.LENGTH_LONG);
-				loginBtn.setVisibility(View.GONE);
+				//loginBtn.setVisibility(View.GONE);
+				hideToLeft(loginBtn);
 			}
 			break;
 		case UPLOAD_VIDEO:
 			if (resultCode == Activity.RESULT_OK) {
+				
 				// TODO: show success message here instead of the 'just opened' state
-				changeState(GameState.kFFStateJustOpened);
+				changeState(GameState.kFFStateFinishedUpload);
 				
 			}
 			break;
@@ -396,6 +406,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					hideToLeft(replayBtn);
 					hideToRight(deleteBtn);
 					hideElementToTop(scoreText);
+				}
+				if(state == GameState.kFFStateFinishedUpload){
+					hideToRight(playAgainBtn);
+					hideElementToTop(successText);
 				}
 				//slide(startBtn,-100,0,0,0,1000);
 				revealFromLeft(startBtn, 750);
@@ -502,7 +516,25 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				revealFromLeft(replayBtn);
 				revealFromRight(deleteBtn);
 			break;
-			
+
+			case kFFStateFinishedUpload:
+				
+				submitBtn.setVisibility(View.GONE);
+				replayBtn.setVisibility(View.GONE);
+				deleteBtn.setVisibility(View.GONE);
+				
+				hideToLeft(submitBtn);
+				hideToLeft(replayBtn);
+				hideToRight(deleteBtn);
+				
+				bringDrawerToLevel(.2f);
+				
+				playAgainBtn.setVisibility(View.VISIBLE);
+				successText.setVisibility(View.VISIBLE);
+				revealFromRight(playAgainBtn);
+				revealElementFromTop(successText);
+				
+			break;
 		}
 		state = toState;
 	}
@@ -541,7 +573,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	
 	private void prepareRecorder() {
 		recorder.setPreviewDisplay(holder.getSurface());
-
 		try {
 			recorder.prepare();
 			Log.i("State", "Recorder Prepared");
@@ -559,7 +590,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	// Surface Holder Implementation
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.v(TAG, "surfaceCreated");
-		prepareRecorder();
+		if(state != GameState.kFFStateFinishedDropScoreView){
+			prepareRecorder();
+		}
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -593,7 +626,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		}
 		else if(v == tempStopFall){
 			fakeStopPress();
-		} else if (v == loginBtn) {
+		}
+		else if (v == loginBtn) {
 			startActivityForResult(new Intent(this, AuthActivity.class), AUTH_REQ);
 		}
 	}
@@ -642,6 +676,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		Log.i("RECORD_TAGS", "RECORDING FINISHED");
 		
 		recorder.stop();
+		recorder.release();
 		recording = false;
 
 		playbackClip();
@@ -728,6 +763,13 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		initRecorder();
 		prepareRecorder();
 		changeState(GameState.kFFStatePreDropCanceled);
+	}
+	
+	public void playAgain(View view){
+		recorder.reset();
+		initRecorder();
+		prepareRecorder();
+		changeState(GameState.kFFStateReadyToDrop);
 	}
 	
 	
