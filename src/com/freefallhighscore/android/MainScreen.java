@@ -99,6 +99,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	File OutputFile = new File(Environment.getExternalStorageDirectory().getPath());
 	String videoDir = "/DCIM/100MEDIA/Video";
 
+	boolean isPaused = true;
 	boolean recording = false;
 	public static final String TAG = "VIDEOCAPTURE";
 
@@ -187,6 +188,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	*/
 	
 	//ANIMATION METHODS
+	/*
 	public void slide(View view, float fromX, float toX, float fromY, float toY, int duration){
 		TranslateAnimation slide = new TranslateAnimation(
 				Animation.RELATIVE_TO_PARENT, fromX/100,
@@ -199,9 +201,15 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		// AnimationSet animations = new AnimationSet(true); 
 		view.startAnimation(slide);
 	}
+	*/
+	
+	protected void revealFromLeft(Button button){
+		button.setEnabled(true);
+		revealFromLeft(button, 250);
+	}
 	
 	protected void revealFromLeft(View view){
-		revealFromLeft(view, 1500);
+		revealFromLeft(view, 250);
 	}
 	
 	protected void revealFromLeft(View view, int duration){
@@ -217,8 +225,13 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		view.startAnimation(slide);
 	}
 	
+	protected void revealFromRight(Button button){
+		button.setEnabled(true);
+		revealFromRight(button, 250);
+	}
+
 	protected void revealFromRight(View view){
-		revealFromRight(view, 500);
+		revealFromRight(view, 250);
 	}
 
 	protected void revealFromRight(View view, int duration){
@@ -233,9 +246,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		// AnimationSet animations = new AnimationSet(true); 
 		view.startAnimation(slide);
 	}
+
+	protected void hideToLeft(Button button){
+		button.setEnabled(false);
+		hideToLeft(button, 250);
+	}
 	
 	protected void hideToLeft(View view){
-		hideToLeft(view, 500);
+		hideToLeft(view, 250);
 	}
 	
 	protected void hideToLeft(View view, int duration){
@@ -250,9 +268,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		// AnimationSet animations = new AnimationSet(true); 
 		view.startAnimation(slide);
 	}
-	
+
+	protected void hideToRight(Button button){
+		button.setEnabled(false);
+		hideToRight(button, 250);
+	}
+
 	protected void hideToRight(View view){
-		hideToRight(view, 500);
+		hideToRight(view, 250);
 	}
 	
 	protected void hideToRight(View view, int duration){
@@ -263,13 +286,18 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				Animation.RELATIVE_TO_PARENT, 0);
 		slide.setDuration(duration);
 		slide.setFillAfter(true);
-
+		
 		// AnimationSet animations = new AnimationSet(true); 
 		view.startAnimation(slide);
 	}
+
+	protected void revealElementFromTop(Button button){
+		button.setEnabled(true);
+		revealElementFromTop(button, 250);
+	}
 	
 	protected void revealElementFromTop(View view){
-		revealElementFromTop(view, 500);
+		revealElementFromTop(view, 250);
 	}
 	
 	protected void revealElementFromTop(View view, int duration){
@@ -285,8 +313,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		view.startAnimation(slide);	
 	}
 
+
+	protected void hideElementToTop(Button button){
+		button.setEnabled(false);
+		hideElementToTop(button, 250);
+	}
+	
 	protected void hideElementToTop(View view){
-		hideElementToTop(view, 500);
+		hideElementToTop(view, 250);
 	}
 	
 	protected void hideElementToTop(View view, int duration){
@@ -329,7 +363,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	public void bringDrawerToLevel(float newLevel){
 		slideDirection = newLevel > currentDrawerLevel ? -1 : 1;
-		slideTarget  = (int) (10000.0 - newLevel*7500.0);
+		//slideTarget  = (int) (10000.0 - newLevel*7500.0);
 		//Log.i("State", "target: " +slideTarget);
 		slideOrigin = drawable.getLevel();
 		slideDistance = Math.abs(slideTarget-slideOrigin);
@@ -343,7 +377,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				Animation.RELATIVE_TO_PARENT, -1.0f + currentDrawerLevel,
 				Animation.RELATIVE_TO_PARENT, -1.0f + newLevel);
 		
-		slide.setDuration(500);
+		slide.setDuration(250);
 		slide.setFillAfter(true);
 
 		// AnimationSet animations = new AnimationSet(true); 
@@ -358,32 +392,37 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	protected void onResume(){
 		super.onResume();
-		Log.d(TAG, "RESUMING MainScreen");
-		
-		// register the accelerometer. Let's get lots of updates. We can tone it down if
-		// need be.
-		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
-		
-		//Log.i("ACCEL", "Turning on ACCEL");
-		
-		// TODO: we probably shouldn't be re-init-ing the recorder here
-		// unless we actually want the camera to be on (if we were on
-		// the submit page, we don't)
-		
-		// TODO FIXME XXX calling initRecorder here overwrites a pre-existing video
-		// with an empty file. To repro: record a drop, go to the submit page, click 'back',
-		// click 'submit' again and upload. It will be 0-byte file. 
-		
-		if(state != GameState.kFFStateFinishedDropScoreView){
-			recorder = new MediaRecorder();
-			// Camera Init
-			initRecorder();
+		if(isPaused){
+			isPaused = false;
+				
+			Log.d(TAG, "RESUMING MainScreen");
+			
+			// register the accelerometer. Let's get lots of updates. We can tone it down if
+			// need be.
+			sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+			
+			//Log.i("ACCEL", "Turning on ACCEL");
+			
+			// TODO: we probably shouldn't be re-init-ing the recorder here
+			// unless we actually want the camera to be on (if we were on
+			// the submit page, we don't)
+			
+			// TODO FIXME XXX calling initRecorder here overwrites a pre-existing video
+			// with an empty file. To repro: record a drop, go to the submit page, click 'back',
+			// click 'submit' again and upload. It will be 0-byte file. 
+			
+			if(state != GameState.kFFStateFinishedDropScoreView){
+				recorder = new MediaRecorder();
+				// Camera Init
+				initRecorder();
+			}
 		}
+
 	}
 
 	protected void onPause() {
 		super.onPause();
-
+		isPaused = true;
 		// make sure to always unregister the sensor...
 		sensorManager.unregisterListener(this);
 		
@@ -402,6 +441,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				//loginBtn.setVisibility(View.GONE);
 				hideToRight(sideLogo);
 				hideToLeft(loginBtn);
+				mainLogo.setVisibility(View.VISIBLE);
+				revealElementFromTop(mainLogo);
+				
 				loggedIn = true;
 			}
 			break;
@@ -424,19 +466,26 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					hideToLeft(replayBtn);
 					hideToRight(deleteBtn);
 					hideElementToTop(scoreText);
+					revealFromLeft(startBtn);
 				}
 				if(state == GameState.kFFStateFinishedUpload){
 					hideToRight(playAgainBtn);
 					hideElementToTop(successText);
 					hideElementToTop(scoreText);
+					revealFromLeft(startBtn);
 				}
 				if(state == GameState.kFFStatePreDropRecording){
 					hideToRight(cancelBtn);
 					hideElementToTop(record);
 					hideElementToTop(go);
+					showStripes();
+					revealElementFromTop(startBtn);
 				}
 				
-				revealFromLeft(startBtn);
+				if(state == GameState.kFFStateJustOpened){
+					revealFromLeft(startBtn);
+				}
+				
 				if(loggedIn){
 					mainLogo.setVisibility(View.VISIBLE);
 					revealElementFromTop(mainLogo);
@@ -452,8 +501,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			break;
 			
 			case kFFStatePreDropRecording:
-				//cropSlide(1, 30);
-				//slide(logo,0,0,0,-100,1000);
+				
 				if(loggedIn){
 					hideElementToTop(mainLogo);
 				}
@@ -462,7 +510,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					hideToRight(sideLogo);
 				}
 				
-				hideToLeft(startBtn);
+				hideElementToTop(startBtn);
 				
 				bringDrawerToLevel(.3f);
 				
@@ -509,19 +557,16 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				
 			break;
 			*/
+			
 			case kFFStateInFreeFall:
 				hideElementToTop(record);
 				hideElementToTop(go);
 				bringDrawerToLevel(0);
-				hideStripes();
 				hideToRight(cancelBtn);
 			break;
 			
 			case kFFStateFinishedDropPostroll:
-				//slide(drawer,0,0,0,-20,1000);				
-				//cropSlide(-1, 80);
 				showStripes();
-				
 			break;
 						
 			case kFFStateFinishedDropVideoPlayback:

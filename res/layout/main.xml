@@ -151,7 +151,7 @@
 		android:layout_height="wrap_content"
 	    android:layout_width="wrap_content"
 	    android:src="@drawable/recording_flash_up"
-	    android:paddingLeft="250dip"
+	    android:paddingLeft="200dip"
 	    android:visibility="gone"
 	/>
 
