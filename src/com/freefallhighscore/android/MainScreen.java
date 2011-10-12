@@ -795,8 +795,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	protected static final float kFFFallTimeThreshold = .12f * 1000.0f;
 	protected static final float kFFFallStartMinForceThreshold  = 0.347f * SensorManager.GRAVITY_EARTH;
-	protected static final float kFFDistanceDecay = 1.33f;
-	protected static final float kFFImpactThreshold  = 6.34f * SensorManager.GRAVITY_EARTH;
+	protected static final float kFFDistanceDecay = 1.33f * SensorManager.GRAVITY_EARTH;
+	protected static final float kFFImpactThreshold  = 6.34f;
 	protected static final long kRecordingTimeout = 20 * 1000;
 	
 	@Override
@@ -850,8 +850,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
                 double deltaForce = Math.sqrt(dX*dX + dY*dY + dZ*dZ);
                 
                 distanceAccum += deltaForce;
-                float deltaT = (a.t - this.lastAccel.t)/1000000.0f;
-                distanceAccum -= deltaT*kFFDistanceDecay/1000.0f;
+                float deltaT = (a.t - this.lastAccel.t)/1000000000.0f;
+                distanceAccum -= deltaT*kFFDistanceDecay;
                 distanceAccum = Math.max(0, distanceAccum);
                 if(distanceAccum > kFFImpactThreshold){
                 	freefallDuration = (long)(a.t - startTimestampOfDrop)/1000000;
