@@ -42,16 +42,27 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	    kFFStateJustOpened,
 	    kFFStateReadyToDrop,
 	    kFFStatePreDropRecording,
-	    //kFFStatePreDropCancelling,
 	    kFFStatePreDropCanceled,
 	    kFFStateInFreeFall,
 	    kFFStateFinishedDropPostroll,
-	    //kFFStateFinishedDropVideoPlaybackFirstLoop,
 	    kFFStateFinishedDropVideoPlayback,
 	    kFFStateFinishedDropScoreView,
 	    kFFStateFinishedUpload
 	};
 
+	public class Accel {
+		Accel(float[] v, long t){
+			this.t = t; 
+			this.x = v[0];
+			this.y = v[1];
+			this.z = v[2];
+		}
+		public long t;
+		public float x;
+		public float y;
+		public float z;
+	};
+	
 	protected GameState state; 
 	
 	private static final int AUTH_REQ = 1;
@@ -59,7 +70,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	private static final int CANCEL_UPLOAD = 3;
 	
 	protected float currentDrawerLevel;
-	protected float freefallDuration;
 	
 	ClipDrawable drawable;
 	private Handler mHandler = new Handler();
@@ -297,6 +307,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		leftStripes.setVisibility(View.VISIBLE);
 		centerStripes.setVisibility(View.VISIBLE);
 	}
+	
 /*
 	public void cropSlide(int direction, int target){
 		slideDirection = direction;
@@ -346,6 +357,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		// need be.
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 		
+		//Log.i("ACCEL", "Turning on ACCEL");
+		
 		// TODO: we probably shouldn't be re-init-ing the recorder here
 		// unless we actually want the camera to be on (if we were on
 		// the submit page, we don't)
@@ -385,14 +398,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			break;
 		case UPLOAD_VIDEO:
 			if (resultCode == Activity.RESULT_OK) {
-				
-				// TODO: show success message here instead of the 'just opened' state
 				changeState(GameState.kFFStateFinishedUpload);
-				
 			}
 			break;
 		}
-		
 	}
 
 	public void changeState(GameState toState){
@@ -542,9 +551,16 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	}
 	
 	public void startRecording(View view){
-		changeState(GameState.kFFStatePreDropRecording);
+		belowThreshold = false;
+		distanceAccum = 0;
+		startTimestampOfDrop = 0;
+		recordStartTimeStamp = lastAccel.t;
+		freefallDuration = 0.0f;
+		
 		recording = true;
 		recorder.start();	
+
+		changeState(GameState.kFFStatePreDropRecording);
 	}
 
 	private void initRecorder() {
@@ -611,17 +627,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 
 	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void onClick(View v) {
 		if (v == tempStartFall) {
 			fakeStartPress();
@@ -649,9 +654,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	//falling methods
 	private void fallBegan() {
-		//TODO: START TIMING
-		
-		//TODO: Animate-hide all interface elements
 		changeState(GameState.kFFStateInFreeFall);
 	}
 	
@@ -671,6 +673,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			}
 		});
 		
+		changeState(GameState.kFFStateFinishedDropPostroll);
+		
+		
 		t.start();
 	}
 	
@@ -683,11 +688,11 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 		playbackClip();
 		
-		runOnUiThread( new Runnable(){
-			public void run() {
-				changeState(GameState.kFFStateFinishedDropPostroll);
-			}
-		});
+//		runOnUiThread( new Runnable(){
+//			public void run() {
+//				
+//			}
+//		});
 	}
 	
 	protected void playbackClip(){
@@ -774,10 +779,89 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		changeState(GameState.kFFStateReadyToDrop);
 	}
 	
-	
-	//accel
-	public void onAccelerationChanged(float x, float y, float z){
-		Log.i("ACCEL", "x:" + x + "y:" + y + "z:" + z);
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		// TODO Auto-generated method stub
+
 	}
 	
+	//vars for calculating freefall
+	protected boolean belowThreshold;
+	protected long startTimestampOfDrop;
+	protected long recordStartTimeStamp;
+	protected float distanceAccum;
+	protected float freefallDuration;
+	protected Accel lastAccel;
+
+	protected static final float kFFFallTimeThreshold = .12f * 1000.0f;
+	protected static final float kFFFallStartMinForceThreshold  = 0.347f;
+	protected static final float kFFDistanceDecay = 1.33f;
+	protected static final float kFFImpactThreshold  = 6.34f;
+	protected static final long kRecordingTimeout = 20 * 1000;
+	
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+
+		//Log.i("ACCEL", "t: " + event.timestamp + " x: " + event.values[0] + "y: " + event.values[1] + " z: " + event.values[2]);
+		Accel a = new Accel(event.values, event.timestamp);
+
+		if(this.lastAccel != null){
+			Log.i("ACCEL", "rate " + (a.t - lastAccel.t) / 1000000.0f  );
+			double accelMagnitude = Math.sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
+			if(state == GameState.kFFStatePreDropRecording){
+				
+				//TEST FOR START
+				if (accelMagnitude < kFFFallStartMinForceThreshold) {
+					if(!belowThreshold){
+						Log.i("ACCEL", "Below THRESHOLD" + accelMagnitude);
+				        belowThreshold = true;
+				        startTimestampOfDrop = a.t;
+				    }
+				    else {
+				    	float timeFalling = (a.t - startTimestampOfDrop)/1000000.0f; 
+				    	Log.i("ACCEL", "Time falling " + timeFalling + " / " + kFFFallTimeThreshold);
+				        if ( timeFalling > kFFFallTimeThreshold ) {                            
+				        	fallBegan(); //IN FREEFALL!
+				            return;
+				        }
+				    }
+				}
+			    else {
+			        if(belowThreshold){
+			        	//Log.i("ACCEL", "Above THRESHOLD" + ( (a.t - startTimestampOfDrop)  / kFFFallTimeThreshold )  );
+			        }
+			    	belowThreshold = false;
+					
+
+			    }
+	
+			   //TEST FOR TIMEOUT
+				float timeSinceRecord = (a.t - recordStartTimeStamp)/1000000.0f;
+               if( timeSinceRecord > kRecordingTimeout){
+            	   Log.i("ACCEL", "TIMEOUT " + ( timeSinceRecord  + " / " + kRecordingTimeout )  );
+                   cancelDrop(cancelBtn);
+               }                   
+			}
+			else if(state == GameState.kFFStateInFreeFall){
+				
+                float dX = this.lastAccel.x - a.x;
+                float dY = this.lastAccel.y - a.y;
+                float dZ = this.lastAccel.z - a.z;
+                
+                double deltaForce = Math.sqrt(dX*dX + dY*dY + dZ*dZ);
+
+                distanceAccum += deltaForce;
+                float deltaT = a.t - this.lastAccel.t;
+                distanceAccum -= deltaT*kFFDistanceDecay;
+                distanceAccum = Math.max(0, distanceAccum);
+                if(distanceAccum > kFFImpactThreshold){
+                    freefallDuration = a.t - startTimestampOfDrop;
+                    finishRecording();
+                }
+            }
+		}
+		this.lastAccel = a;
+	}
+
+
 }
