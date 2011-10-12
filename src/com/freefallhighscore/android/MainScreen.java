@@ -163,7 +163,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		state = GameState.kFFStateJustOpened;
 		currentDrawerLevel = 0.0f;
 		
-		freefallDuration = 1142; //fake duration
+		freefallDuration = 0; //fake duration
 		
 		changeState(GameState.kFFStateReadyToDrop);
 	}
@@ -555,7 +555,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		distanceAccum = 0;
 		startTimestampOfDrop = 0;
 		recordStartTimeStamp = lastAccel.t;
-		freefallDuration = 0.0f;
+		freefallDuration = 0;
 		
 		recording = true;
 		recorder.start();	
@@ -790,7 +790,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	protected long startTimestampOfDrop;
 	protected long recordStartTimeStamp;
 	protected float distanceAccum;
-	protected float freefallDuration;
+	protected long freefallDuration;
 	protected Accel lastAccel;
 
 	protected static final float kFFFallTimeThreshold = .12f * 1000.0f;
@@ -850,12 +850,12 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
                 double deltaForce = Math.sqrt(dX*dX + dY*dY + dZ*dZ);
                 
                 distanceAccum += deltaForce;
-                float deltaT = a.t - this.lastAccel.t;
-                distanceAccum -= deltaT*kFFDistanceDecay;
+                float deltaT = (a.t - this.lastAccel.t)/1000000.0f;
+                distanceAccum -= deltaT*kFFDistanceDecay/1000.0f;
                 distanceAccum = Math.max(0, distanceAccum);
                 if(distanceAccum > kFFImpactThreshold){
-                    freefallDuration = (a.t - startTimestampOfDrop)/1000000;
-                    finishRecording();
+                	freefallDuration = (long)(a.t - startTimestampOfDrop)/1000000;
+                	fallEnded();
                 }
                 
                 Log.i("ACCEL", "FALLING delta force: " + deltaForce + " distance accum " + distanceAccum + " / " + kFFFallTimeThreshold);
