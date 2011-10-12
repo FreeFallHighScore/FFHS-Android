@@ -194,7 +194,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 				data.title = this.title;
 				
 				// TODO: what category should this be?
-				data.category = "Sports";
+				// 	data.category = "freefallhighscore";
 				data.description = this.desc;
 				data.fileName = URLEncoder.encode(videoFile.getName(), "UTF-8");
 				data.fileData = new FileInputStream(videoFile);

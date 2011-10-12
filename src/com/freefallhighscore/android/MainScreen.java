@@ -806,6 +806,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		Accel a = new Accel(event.values, event.timestamp);
 
 		if(this.lastAccel != null){
+
 			//Log.i("ACCEL", "rate " + 1000 / (a.t - lastAccel.t) / 1000000.0f  );
 			double accelMagnitude = Math.sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
 			if(state == GameState.kFFStatePreDropRecording){

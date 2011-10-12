@@ -11,7 +11,7 @@ public class UploadRequestData {
 	@Key public String privacy = "public";
 	
 	// required
-	@Key public String category;
+	@Key public List<String> category = Lists.newArrayList("Sports", "freefallhighscore");
 	@Key public String description;
 	@Key public List<String> tags = Lists.newArrayList();
 	
