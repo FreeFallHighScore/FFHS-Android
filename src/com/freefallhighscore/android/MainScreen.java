@@ -42,7 +42,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	    kFFStateJustOpened,
 	    kFFStateReadyToDrop,
 	    kFFStatePreDropRecording,
-	    kFFStatePreDropCanceled,
+	    //kFFStatePreDropCanceled,
 	    kFFStateInFreeFall,
 	    kFFStateFinishedDropPostroll,
 	    kFFStateFinishedDropVideoPlayback,
@@ -74,11 +74,13 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	ClipDrawable drawable;
 	private Handler mHandler = new Handler();
 	protected TextView go, scoreText, successText;
+	private boolean loggedIn;
+	
 	int slideDirection, slideTarget, slideOrigin, slideDistance;
 	Button whatBtn, loginBtn, startBtn, cancelBtn, tempStartFall, tempStopFall;
 	Button submitBtn, replayBtn, deleteBtn, playAgainBtn;
 	
-	ImageView logo, logoWhite, logoBlack, circle, record;
+	ImageView mainLogo, sideLogo, logoBlack, circle, record;
 	
 	//Spinner videoLoadSpinner;
 	View drawer; 
@@ -107,6 +109,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		//TODO: try to restore login
+		loggedIn = false;
+		
 		sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
@@ -121,8 +126,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 		drawer 		= (View) findViewById(R.id.drawer);
 		go 			= (TextView) findViewById(R.id.go);
-		logo 		= (ImageView) findViewById(R.id.logo); 
-		logoWhite 	= (ImageView) findViewById(R.id.logo_white);
+		mainLogo 	= (ImageView) findViewById(R.id.mainLogo); 
+		sideLogo 	= (ImageView) findViewById(R.id.sideLogo);
 		leftStripes = (ImageView) findViewById(R.id.left);
 		rightStripes= (ImageView) findViewById(R.id.right);
 		
@@ -168,6 +173,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		changeState(GameState.kFFStateReadyToDrop);
 	}
 
+	/*
 	private Runnable mUpdateTimeTask = new Runnable() {
 		long start = SystemClock.uptimeMillis();
 		public void run() {
@@ -178,7 +184,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			else  mHandler.removeCallbacks(mUpdateTimeTask);
 		}
 	};
-
+	*/
+	
 	//ANIMATION METHODS
 	public void slide(View view, float fromX, float toX, float fromY, float toY, int duration){
 		TranslateAnimation slide = new TranslateAnimation(
@@ -323,12 +330,12 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	public void bringDrawerToLevel(float newLevel){
 		slideDirection = newLevel > currentDrawerLevel ? -1 : 1;
 		slideTarget  = (int) (10000.0 - newLevel*7500.0);
-		Log.i("State", "target: " +slideTarget);
+		//Log.i("State", "target: " +slideTarget);
 		slideOrigin = drawable.getLevel();
 		slideDistance = Math.abs(slideTarget-slideOrigin);
 		
-		mHandler.removeCallbacks(mUpdateTimeTask);  //Remove old timer
-		mHandler.postDelayed(mUpdateTimeTask, 100); //How fast thread updated
+		//mHandler.removeCallbacks(mUpdateTimeTask);  //Remove old timer
+		//mHandler.postDelayed(mUpdateTimeTask, 100); //How fast thread updated
 		
 		TranslateAnimation slide = new TranslateAnimation(
 				Animation.RELATIVE_TO_PARENT,  0.0f,
@@ -393,7 +400,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			if (resultCode == Activity.RESULT_OK) {
 				Toast.makeText(this, "You are now authed.", Toast.LENGTH_LONG);
 				//loginBtn.setVisibility(View.GONE);
+				hideToRight(sideLogo);
 				hideToLeft(loginBtn);
+				loggedIn = true;
 			}
 			break;
 		case UPLOAD_VIDEO:
@@ -419,31 +428,46 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				if(state == GameState.kFFStateFinishedUpload){
 					hideToRight(playAgainBtn);
 					hideElementToTop(successText);
+					hideElementToTop(scoreText);
 				}
-				//slide(startBtn,-100,0,0,0,1000);
-				revealFromLeft(startBtn, 750);
-				revealFromLeft(loginBtn, 1000); //TODO make conditional on login status
+				if(state == GameState.kFFStatePreDropRecording){
+					hideToRight(cancelBtn);
+					hideElementToTop(record);
+					hideElementToTop(go);
+				}
 				
-				slide(logo,0,0,-100,0,1000);
-				slide(drawer,0,0,-100,-20,1000);
-				
+				revealFromLeft(startBtn);
+				if(loggedIn){
+					mainLogo.setVisibility(View.VISIBLE);
+					revealElementFromTop(mainLogo);
+				}
+				else{
+					mainLogo.setVisibility(View.GONE);
+					sideLogo.setVisibility(View.VISIBLE);
+					revealFromRight(sideLogo);
+					revealFromLeft(loginBtn);
+				}
+								
 				bringDrawerToLevel(.8f);
-				
-				//tempStartFall.setVisibility(View.GONE);
-				
 			break;
 			
 			case kFFStatePreDropRecording:
 				//cropSlide(1, 30);
 				//slide(logo,0,0,0,-100,1000);
-				hideElementToTop(logo);
-				bringDrawerToLevel(.3f);
-				slide(drawer,0,0,0,-70,1000);
-				//slide(startBtn,0,-100,0,0,1000);
-				hideToLeft(loginBtn);
+				if(loggedIn){
+					hideElementToTop(mainLogo);
+				}
+				else{
+					hideToLeft(loginBtn);
+					hideToRight(sideLogo);
+				}
+				
 				hideToLeft(startBtn);
 				
+				bringDrawerToLevel(.3f);
+				
 				cancelBtn.setVisibility(View.VISIBLE);
+				
 				//slide(cancelBtn,100,0,0,0,1000);
 				revealFromRight(cancelBtn);
 				
@@ -455,20 +479,21 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				//slide(record,0,0,-100,0,1000);
 				revealElementFromTop(record);
 				
+				hideStripes();
+				
 				//TODO: add drop circle
 				//circle.setVisibility(0);
 				//circle.startAnimation(rotate);
 				//slide(circle,0,0,100,0,1000);
 				
-				// TODO replace these controls with the accelerometer
-				//tempStartFall.setVisibility(View.VISIBLE);
 			break;
 				
 			//case kFFStatePreDropCancelling:
 			//break;
-			
+			/*
 			case kFFStatePreDropCanceled:
-				slide(logo,0,0,-100,0,1000);
+				//slide(logo,0,0,-100,0,1000);
+				
 				//slide(drawer,0,0,-100,-20,1000);				
 				//cropSlide(-1, 80);
 				bringDrawerToLevel(.8f);
@@ -483,7 +508,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				//tempStartFall.setVisibility(View.GONE);
 				
 			break;
-			
+			*/
 			case kFFStateInFreeFall:
 				hideElementToTop(record);
 				hideElementToTop(go);
@@ -769,7 +794,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		recording = false;
 		initRecorder();
 		prepareRecorder();
-		changeState(GameState.kFFStatePreDropCanceled);
+		changeState(GameState.kFFStateReadyToDrop);
 	}
 	
 	public void playAgain(View view){

@@ -53,19 +53,19 @@
     
     <!-- BLACK LOGO -->
     <ImageView
-	     android:id="@+id/logo"
+	     android:id="@+id/mainLogo"
 	     android:layout_height="wrap_content"
 	     android:layout_width="wrap_content"
 	     android:src="@drawable/logo_black"
 	     android:layout_toRightOf="@id/left"
 	     android:scaleType="matrix"
-	     android:paddingTop="30dip"
-	     android:paddingLeft= "60dip"
+	     android:paddingTop="20dip"
+	     android:paddingLeft= "30dip"
      	/> 
      	
     <!-- WHITE LOGO -->
      <ImageView
-	     android:id="@+id/logo_white"
+	     android:id="@+id/sideLogo"
 	     android:layout_height="wrap_content"
 	     android:layout_width="wrap_content"
 	     android:src="@drawable/logo_white"
@@ -229,7 +229,7 @@
 		android:layout_width="wrap_content"
 		android:text="SUBMIT"
 		android:textSize="30dip"
-		android:layout_marginTop="120dip"
+		android:layout_marginTop="100dip"
 		android:background="@drawable/submit_btn_up"
 		android:gravity="top|center_horizontal"
 		android:paddingTop="5dip"
@@ -244,7 +244,7 @@
 		android:layout_width="wrap_content"
 		android:text="REPLAY"
 		android:textSize="30dip"
-		android:layout_marginTop="160dip"
+		android:layout_marginTop="180dip"
 		android:background="@drawable/play_btn_up"
 		android:gravity="top|center_horizontal"
 		android:paddingTop="5dip"
