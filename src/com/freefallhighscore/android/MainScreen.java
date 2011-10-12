@@ -142,11 +142,11 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		successText = (TextView) findViewById(R.id.success);
 		
 		// temporary buttons - to be replaced by accelerometer business
-		tempStartFall = (Button) findViewById(R.id.tempStartFall); 
-		tempStartFall.setOnClickListener(this);
-		
-		tempStopFall = (Button) findViewById(R.id.tempStopFall); 
-		tempStopFall.setOnClickListener(this);
+//		tempStartFall = (Button) findViewById(R.id.tempStartFall); 
+//		tempStartFall.setOnClickListener(this);
+//		
+//		tempStopFall = (Button) findViewById(R.id.tempStopFall); 
+//		tempStopFall.setOnClickListener(this);
 		
 		//videoLoadSpinner = (Spinner)findViewById(R.id.videoPlaybackSpinner);
 
@@ -429,7 +429,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				
 				bringDrawerToLevel(.8f);
 				
-				tempStartFall.setVisibility(View.GONE);
+				//tempStartFall.setVisibility(View.GONE);
 				
 			break;
 			
@@ -461,7 +461,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				//slide(circle,0,0,100,0,1000);
 				
 				// TODO replace these controls with the accelerometer
-				tempStartFall.setVisibility(View.VISIBLE);
+				//tempStartFall.setVisibility(View.VISIBLE);
 			break;
 				
 			//case kFFStatePreDropCancelling:
@@ -480,7 +480,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				revealFromLeft(loginBtn);
 				revealFromLeft(startBtn);
 				
-				tempStartFall.setVisibility(View.GONE);
+				//tempStartFall.setVisibility(View.GONE);
 				
 			break;
 			
@@ -628,29 +628,29 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	@Override
 	public void onClick(View v) {
-		if (v == tempStartFall) {
-			fakeStartPress();
-		}
-		else if(v == tempStopFall){
-			fakeStopPress();
-		}
-		else if (v == loginBtn) {
+//		if (v == tempStartFall) {
+//			fakeStartPress();
+//		}
+//		else if(v == tempStopFall){
+//			fakeStopPress();
+//		}
+		if (v == loginBtn) {
 			startActivityForResult(new Intent(this, AuthActivity.class), AUTH_REQ);
 		}
 	}
 
-	private void fakeStartPress() {
-		tempStartFall.setVisibility(View.GONE);
-		tempStopFall.setVisibility(View.VISIBLE);
-		//videoLoadSpinner.setVisibility(View.VISIBLE);
-		fallBegan();
-	}
-	
-	private void fakeStopPress() {
-		tempStopFall.setVisibility(View.GONE);
-		//videoLoadSpinner.setVisibility(View.VISIBLE);
-		fallEnded();
-	}
+//	private void fakeStartPress() {
+//		tempStartFall.setVisibility(View.GONE);
+//		tempStopFall.setVisibility(View.VISIBLE);
+//		//videoLoadSpinner.setVisibility(View.VISIBLE);
+//		fallBegan();
+//	}
+//	
+//	private void fakeStopPress() {
+//		tempStopFall.setVisibility(View.GONE);
+//		//videoLoadSpinner.setVisibility(View.VISIBLE);
+//		fallEnded();
+//	}
 
 	//falling methods
 	private void fallBegan() {
