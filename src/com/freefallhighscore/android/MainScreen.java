@@ -412,22 +412,35 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			// click 'submit' again and upload. It will be 0-byte file. 
 			
 			if(state != GameState.kFFStateFinishedDropScoreView){
-				recorder = new MediaRecorder();
-				// Camera Init
-				initRecorder();
+				if(recorder == null){
+					recorder = new MediaRecorder();
+					// Camera Init
+					initRecorder();
+				}
 			}
 		}
-
 	}
 
 	protected void onPause() {
 		super.onPause();
+		
 		isPaused = true;
 		// make sure to always unregister the sensor...
 		sensorManager.unregisterListener(this);
+		if(recorder != null){
+			if(recording){
+				recorder.stop();
+				recording = false;
+			}
+			
+			//and release the recorder
+			recorder.release();
+			recorder = null;
+		}		
 		
-		//and release the recorder
-		recorder.release();
+		if(state != GameState.kFFStateFinishedDropScoreView){
+			changeState(GameState.kFFStateReadyToDrop);
+		}
 	}
 
 	@Override
@@ -480,10 +493,23 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					hideElementToTop(go);
 					showStripes();
 					revealElementFromTop(startBtn);
+
+					if(recorder != null){
+						recorder.stop();
+						recording = false;
+					}
+
 				}
 				
 				if(state == GameState.kFFStateJustOpened){
 					revealFromLeft(startBtn);
+				}
+				
+				if(state != GameState.kFFStateJustOpened && state != GameState.kFFStateFinishedUpload){
+					if(recorder != null){
+						initRecorder();
+						prepareRecorder();
+					}
 				}
 				
 				if(loggedIn){
@@ -501,7 +527,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			break;
 			
 			case kFFStatePreDropRecording:
-				
+				recording = true;
+				recorder.start();	
+
 				if(loggedIn){
 					hideElementToTop(mainLogo);
 				}
@@ -535,28 +563,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				//slide(circle,0,0,100,0,1000);
 				
 			break;
-				
-			//case kFFStatePreDropCancelling:
-			//break;
-			/*
-			case kFFStatePreDropCanceled:
-				//slide(logo,0,0,-100,0,1000);
-				
-				//slide(drawer,0,0,-100,-20,1000);				
-				//cropSlide(-1, 80);
-				bringDrawerToLevel(.8f);
-				
-				hideElementToTop(record);
-				hideElementToTop(go);
-				
-				hideToRight(cancelBtn);
-				revealFromLeft(loginBtn);
-				revealFromLeft(startBtn);
-				
-				//tempStartFall.setVisibility(View.GONE);
-				
-			break;
-			*/
+
 			
 			case kFFStateInFreeFall:
 				hideElementToTop(record);
@@ -627,13 +634,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		recordStartTimeStamp = lastAccel.t;
 		freefallDuration = 0;
 		
-		recording = true;
-		recorder.start();	
-
 		changeState(GameState.kFFStatePreDropRecording);
 	}
 
 	private void initRecorder() {
+		if(recorder == null){
+			recorder = new MediaRecorder();
+		}
+
 		recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
 		recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 
@@ -679,6 +687,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.v(TAG, "surfaceCreated");
 		if(state != GameState.kFFStateFinishedDropScoreView){
+			if(recorder == null){
+				recorder = new MediaRecorder();
+				initRecorder();
+			}
 			prepareRecorder();
 		}
 	}
@@ -688,11 +700,16 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.v(TAG, "surfaceDestroyed");
-		if (recording) {
-			recorder.stop();
-			recording = false;
+		
+		if(recorder != null){
+			if (recording) {
+				recorder.stop();
+				recording = false;
+			}
+			
+			recorder.release();
+			recorder = null;
 		}
-		recorder.release();
 	}
 
 
@@ -753,16 +770,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		Log.i("RECORD_TAGS", "RECORDING FINISHED");
 		
 		recorder.stop();
-		//recorder.release();
 		recording = false;
 
 		playbackClip();
-		
-//		runOnUiThread( new Runnable(){
-//			public void run() {
-//				
-//			}
-//		});
 	}
 	
 	protected void playbackClip(){
@@ -821,9 +831,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	}
 	
 	public void deleteClip(View view){
-		//TODO: delete clip
-		initRecorder();
-		prepareRecorder();
+//		initRecorder();
+//		prepareRecorder();
 		changeState(GameState.kFFStateReadyToDrop);
 	}
 	
@@ -835,17 +844,17 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	}
 	
 	public void cancelDrop(View view){
-		recorder.stop();
-		recording = false;
-		initRecorder();
-		prepareRecorder();
+//		recorder.stop();
+//		recording = false;
+//		initRecorder();
+//		prepareRecorder();
 		changeState(GameState.kFFStateReadyToDrop);
 	}
 	
 	public void playAgain(View view){
-		recorder.reset();
-		initRecorder();
-		prepareRecorder();
+//		recorder.reset();
+//		initRecorder();
+//		prepareRecorder();
 		changeState(GameState.kFFStateReadyToDrop);
 	}
 	

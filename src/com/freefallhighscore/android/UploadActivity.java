@@ -53,7 +53,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 		// TODO: should these two guys be in onResume() instead?
 		Intent creator = getIntent();
 		videoFileName = creator.getStringExtra("videoFileName");
-		freefallDuration = creator.getIntExtra("freefallDuration", 0);
+		freefallDuration = creator.getLongExtra("freefallDuration", 0);
 		
 		
 		setupViewReferences();
@@ -69,6 +69,7 @@ public class UploadActivity extends Activity implements OnClickListener {
 	private void setupViewReferences() {
 		backButton = (Button) findViewById(R.id.back);
 		fallDurationText = (TextView) findViewById(R.id.fall_duration);
+		fallDurationText.setText("" + freefallDuration/1000.0f + "s");
 		loginLogoutButton = (Button) findViewById(R.id.login_logout_button);
 		
 		videoTitleInput = (EditText) findViewById(R.id.video_title_input);

@@ -176,8 +176,8 @@
    		android:textColor="#FFFFFF"
    		android:background="#000000"
    		android:textSize="28sp"
-   		android:layout_marginTop="40dip"
-		android:layout_marginLeft="60dip"
+   		android:layout_marginTop="20dip"
+		android:layout_marginLeft="40dip"
 		android:padding="5dip"
 		android:visibility="gone"	
    		/>
@@ -216,8 +216,8 @@
    		android:textColor="#FFFFFF"
    		android:background="#000000"
    		android:textSize="28sp"
-   		android:layout_marginTop="40dip"
-		android:layout_marginLeft="60dip"
+   		android:layout_marginTop="20dip"
+		android:layout_marginLeft="40dip"
 		android:padding="5dip"
 		android:visibility="gone"	
    		/>
