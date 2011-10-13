@@ -30,6 +30,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,7 +78,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	private boolean loggedIn;
 	
 	int slideDirection, slideTarget, slideOrigin, slideDistance;
-	Button whatBtn, loginBtn, startBtn, cancelBtn, tempStartFall, tempStopFall;
+	Button whatBtn, loginBtn, startBtn, cancelBtn, tempStartFall, tempStopFall, info;
 	Button submitBtn, replayBtn, deleteBtn, playAgainBtn;
 	
 	ImageView mainLogo, sideLogo, logoBlack, circle, record;
@@ -85,7 +86,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	//Spinner videoLoadSpinner;
 	View drawer; 
 	ImageView leftStripes, rightStripes, centerStripes;
-	Animation rotate;
+    ImageView circles[] = new ImageView[8];
+	Animation rotateFwd, rotateRvs;
+	RelativeLayout wheel;
 
 	// Accelerometer
 	SensorManager sensorManager;
@@ -125,7 +128,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 		// UI Elements + Animations
 //		circle = (ImageView) findViewById(R.id.circle);
-		rotate = AnimationUtils.loadAnimation(this, R.anim.rotate);
 
 		drawer 		= (View) findViewById(R.id.drawer);
 		go 			= (TextView) findViewById(R.id.go);
@@ -148,6 +150,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		
 		playAgainBtn = (Button) findViewById(R.id.playagain);
 		successText = (TextView) findViewById(R.id.success);
+		info = (Button) findViewById(R.id.info);
+		
+		// Configure Rotate Animations 
+		
+		wheel = (RelativeLayout) findViewById(R.id.wheel);
+        rotateFwd = AnimationUtils.loadAnimation(this, R.anim.rotate_fwd);
+        rotateRvs = AnimationUtils.loadAnimation(this, R.anim.rotate_rvs);
+        initWheel();
 		
 		// temporary buttons - to be replaced by accelerometer business
 //		tempStartFall = (Button) findViewById(R.id.tempStartFall); 
@@ -314,6 +324,23 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		// AnimationSet animations = new AnimationSet(true); 
 		view.startAnimation(slide);	
 	}
+	
+	protected void revealElementFromBottom(View view){
+		revealElementFromTop(view, 250);
+	}
+	
+	protected void revealElementFromBottom(View view, int duration){
+		TranslateAnimation slide = new TranslateAnimation(
+				Animation.RELATIVE_TO_PARENT, 0,
+				Animation.RELATIVE_TO_PARENT, 0,
+				Animation.RELATIVE_TO_PARENT, 1,
+				Animation.RELATIVE_TO_PARENT, 0);
+		slide.setDuration(duration);
+		slide.setFillAfter(true);
+
+		// AnimationSet animations = new AnimationSet(true); 
+		view.startAnimation(slide);	
+	}
 
 
 	protected void hideElementToTop(Button button){
@@ -331,6 +358,24 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				Animation.RELATIVE_TO_PARENT, 0,
 				Animation.RELATIVE_TO_PARENT, 0,
 				Animation.RELATIVE_TO_PARENT, -1);
+		
+		slide.setDuration(duration);
+		slide.setFillAfter(true);
+
+		// AnimationSet animations = new AnimationSet(true); 
+		view.startAnimation(slide);	
+	}
+	
+	protected void hideElementToBottom(View view){
+		hideElementToTop(view, 250);
+	}
+	
+	protected void hideElementToBottom(View view, int duration){
+		TranslateAnimation slide = new TranslateAnimation(
+				Animation.RELATIVE_TO_PARENT, 0,
+				Animation.RELATIVE_TO_PARENT, 0,
+				Animation.RELATIVE_TO_PARENT, 0,
+				Animation.RELATIVE_TO_PARENT, 1);
 		
 		slide.setDuration(duration);
 		slide.setFillAfter(true);
@@ -362,6 +407,21 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		mHandler.postDelayed(mUpdateTimeTask, 100); //How fast thread updated
 	}
 */
+	protected void initWheel(){
+        Integer circleId[] = {
+        		R.drawable.wheel_0, R.drawable.wheel_1, R.drawable.wheel_2, R.drawable.wheel_3, R.drawable.wheel_4, R.drawable.wheel_5, R.drawable.wheel_6, R.drawable.wheel_7
+        };
+        for(int i =0; i<circles.length; i++){
+        	circles[i] = new ImageView(this); 
+        	circles[i].setImageResource(circleId[i]);
+        	wheel.addView(circles[i]);
+        	Animation rotator;
+        	if(i%2==0) rotator = rotateFwd;
+        	else rotator = rotateRvs;
+        	rotator.setDuration(i*1000);
+        	circles[i].startAnimation(rotator);
+        }
+	}
 
 	public void bringDrawerToLevel(float newLevel){
 		slideDirection = newLevel > currentDrawerLevel ? -1 : 1;
@@ -518,6 +578,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					hideElementToTop(go);
 					showStripes();
 					revealElementFromTop(startBtn);
+					
+					revealFromRight(info);
+
+					wheel.setVisibility(View.GONE);					
 
 //					if(recorder != null){
 //						recorder.stop();
@@ -579,6 +643,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				record.setVisibility(View.VISIBLE);
 				revealElementFromTop(record);
 				
+				
+				hideToRight(info);
+				wheel.setVisibility(View.VISIBLE);
+
 				hideStripes();
 				
 				//TODO: add drop circle
