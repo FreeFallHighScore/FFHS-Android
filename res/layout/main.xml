@@ -88,8 +88,24 @@
 	     android:layout_marginTop="20dip"
    	     android:visibility="gone"
      	/> 
+
+
+	<!--  what? button -->
+	<Button
+		android:id="@+id/what_btn"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="WHAT"
+		android:textSize="30dip"
+		android:layout_marginTop="80dip"
+		android:background="@drawable/login_btn_up"
+		android:gravity="top|center_horizontal"
+		android:paddingTop="5dip"
+		android:onClick="showInfo"
+	    />
 	    
-	<!--  START BUTTON -->
+	    
+	<!--  login button -->
 	<Button
 		android:id="@+id/login_btn"
 		android:layout_height="wrap_content"
@@ -102,6 +118,7 @@
 		android:paddingTop="5dip"
 	    />
 	    
+	<!--  START BUTTON -->
 	<Button
 		android:id="@+id/start"
 		android:layout_height="wrap_content"
@@ -167,18 +184,19 @@
 	    android:visibility="gone"
 	/>
 
-	<!-- 
+	
 	 <Button
 		android:id="@+id/info"
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"
 		android:onClick="buttonPressed"
 		android:layout_alignParentRight="true"
-		android:layout_marginTop="20dip"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="20dip"
 		android:layout_marginRight="20dip"
 		android:background="@drawable/i_btn"
 	    /> 
-  	-->
+  	
   
 	<TextView  
 	   	android:id="@+id/go"
@@ -314,5 +332,17 @@
 		android:onClick="playAgain"
 		android:visibility="gone"
 	   />
+	   
+	<!-- WHEEL -->
+	<RelativeLayout
+		android:id="@+id/wheel"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="20dip"
+	    android:layout_marginBottom="20dip"
+	    android:layout_alignParentBottom="true"
+	    android:visibility="gone"
+	    />
+	   	
 	   	
 </RelativeLayout>
