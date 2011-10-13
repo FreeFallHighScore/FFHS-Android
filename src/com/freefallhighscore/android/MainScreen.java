@@ -350,18 +350,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		leftStripes.setVisibility(View.VISIBLE);
 		centerStripes.setVisibility(View.VISIBLE);
 	}
-	
-/*
-	public void cropSlide(int direction, int target){
-		slideDirection = direction;
-		slideTarget  = (int) (10000.0 - target/100.0*7500.0);
-		Log.i("State", "target: " +slideTarget);
-		slideOrigin = drawable.getLevel();
-		slideDistance = Math.abs(slideTarget-slideOrigin);
-		mHandler.removeCallbacks(mUpdateTimeTask);  //Remove old timer
-		mHandler.postDelayed(mUpdateTimeTask, 100); //How fast thread updated
-	}
-*/
 
 	public void bringDrawerToLevel(float newLevel){
 		slideDirection = newLevel > currentDrawerLevel ? -1 : 1;
@@ -519,12 +507,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					showStripes();
 					revealElementFromTop(startBtn);
 
-//					if(recorder != null){
-//						recorder.stop();
-//						recording = false;
-//					}
-//					recorder = null;
-//					recorderIsShown = false;
 					destroyRecorder(false);
 				}
 				
@@ -532,14 +514,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					revealFromLeft(startBtn);
 				}
 				
-				//if(state != GameState.kFFStateJustOpened && state != GameState.kFFStateFinishedUpload){
-//				if(recorder == null){
-//					initRecorder();
-//					prepareRecorder();
-//				}
 				ensureRecorderShown();
-				
-				//}
 				
 				if(loggedIn){
 					mainLogo.setVisibility(View.VISIBLE);
