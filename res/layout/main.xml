@@ -72,7 +72,7 @@
 	     android:layout_alignParentLeft="true"
 	     android:scaleType="matrix"
 	     android:paddingTop="35dip"
-	     android:paddingLeft="60dip"
+	     android:paddingLeft="50dip"
      	/> 
      	
     <!-- WHITE LOGO -->
@@ -145,7 +145,7 @@
 		android:background="@drawable/delete_btn"
 		android:gravity="top|center_horizontal"
 		android:paddingLeft="45dip"
-		android:paddingTop="8dip"
+		android:paddingTop="10dip"
 		android:onClick="cancelDrop"
 		android:visibility="gone"
 	    />
@@ -295,7 +295,7 @@
 		android:background="@drawable/delete_btn"
 		android:gravity="top|center_horizontal"
 		android:paddingLeft="45dip"
-		android:paddingTop="5dip"
+		android:paddingTop="10dip"
 		android:onClick="deleteClip"
 		android:visibility="gone"
 	/>

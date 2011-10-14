@@ -112,7 +112,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	boolean recorderIsShown = false;
 	public static final String TAG = "VIDEOCAPTURE";
 
-	int count= 0;
+	int count = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -161,17 +161,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		wheel = (RelativeLayout) findViewById(R.id.wheel);
         rotateFwd = AnimationUtils.loadAnimation(this, R.anim.rotate_fwd);
         rotateRvs = AnimationUtils.loadAnimation(this, R.anim.rotate_rvs);
+
         initWheel();
 		
-		// temporary buttons - to be replaced by accelerometer business
-//		tempStartFall = (Button) findViewById(R.id.tempStartFall); 
-//		tempStartFall.setOnClickListener(this);
-//		
-//		tempStopFall = (Button) findViewById(R.id.tempStopFall); 
-//		tempStopFall.setOnClickListener(this);
-		
-		//videoLoadSpinner = (Spinner)findViewById(R.id.videoPlaybackSpinner);
-
 		Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Univers_65_Bold.ttf");
 		whatBtn.setTypeface(tf);
 		loginBtn.setTypeface(tf);
@@ -179,6 +171,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		cancelBtn.setTypeface(tf);
 		deleteBtn.setTypeface(tf);
 		playAgainBtn.setTypeface(tf);
+		
+		submitBtn.setTypeface(tf);
+		replayBtn.setTypeface(tf);
+		
 		go.setTypeface(tf);
 		scoreText.setTypeface(tf);
 		successText.setTypeface(tf);
