@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, SplashActivity!</string>
-    <string name="app_name">FFHS</string>
+    <string name="app_name">FreefallHS</string>
     <string name="info_about_head">ABOUT</string>
 <string name="info_about">Freefall Highscore encourages you to drop you device from high places to achieve the longest duration of free fall. We\'ll record the video and let you submit it to the website featuring the leading drops.<br />
 <br />

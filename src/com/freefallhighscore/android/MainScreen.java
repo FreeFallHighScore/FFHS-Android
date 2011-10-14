@@ -89,7 +89,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	//Spinner videoLoadSpinner;
 	View drawer; 
 	ImageView leftStripes, rightStripes, centerStripes;
-    ImageView circles[] = new ImageView[7];
+    ImageView[] circles = new ImageView[7];
 	Animation rotateFwd, rotateRvs;
 	RelativeLayout wheel;
 
@@ -104,7 +104,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	File OutputFile = new File(Environment.getExternalStorageDirectory().getPath());
 	String videoDir = "/DCIM/100MEDIA/Video";
-	String metaDir = "/FFHS/meta/";
+	
+	int circlesToHide;
 	
 	boolean isPaused = true;
 	boolean recording = false;
@@ -157,7 +158,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		info = (Button) findViewById(R.id.info);
 		
 		// Configure Rotate Animations 
-		
 		wheel = (RelativeLayout) findViewById(R.id.wheel);
         rotateFwd = AnimationUtils.loadAnimation(this, R.anim.rotate_fwd);
         rotateRvs = AnimationUtils.loadAnimation(this, R.anim.rotate_rvs);
@@ -171,6 +171,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		cancelBtn.setTypeface(tf);
 		deleteBtn.setTypeface(tf);
 		playAgainBtn.setTypeface(tf);
+		info.setVisibility(View.GONE);
 		
 		submitBtn.setTypeface(tf);
 		replayBtn.setTypeface(tf);
@@ -195,35 +196,24 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		}
 	}
 
-	/*
+	
 	private Runnable mUpdateTimeTask = new Runnable() {
-		long start = SystemClock.uptimeMillis();
 		public void run() {
-			long millis = SystemClock.uptimeMillis() - start;
+			
+            
+			/*
 			drawable.setLevel(drawable.getLevel()  + (slideDistance/10 * slideDirection));
-			if(( drawable.getLevel() > slideTarget && slideDirection == -1) || ( drawable.getLevel() < slideTarget && slideDirection == 1))
+			if(( drawable.getLevel() > slideTarget && slideDirection == -1) || ( drawable.getLevel() < slideTarget && slideDirection == 1)){
 				mHandler.postAtTime(this, start + millis);
-			else  mHandler.removeCallbacks(mUpdateTimeTask);
+			}
+			else{
+				
+			}
+			*/
 		}
 	};
-	*/
 	
 	//ANIMATION METHODS
-	/*
-	public void slide(View view, float fromX, float toX, float fromY, float toY, int duration){
-		TranslateAnimation slide = new TranslateAnimation(
-				Animation.RELATIVE_TO_PARENT, fromX/100,
-				Animation.RELATIVE_TO_PARENT, toX/100,
-				Animation.RELATIVE_TO_PARENT, fromY/100,
-				Animation.RELATIVE_TO_PARENT, toY/100);
-		slide.setDuration(duration);
-		slide.setFillAfter(true);
-
-		// AnimationSet animations = new AnimationSet(true); 
-		view.startAnimation(slide);
-	}
-	*/
-	
 	protected void revealFromLeft(Button button){
 		button.setEnabled(true);
 		revealFromLeft(button, 250);
@@ -426,11 +416,20 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
         	Animation rotator;
         	if(i%2==0) rotator = rotateFwd;
         	else rotator = rotateRvs;
-        	rotator.setDuration(i*500);
+        	rotator.setDuration(i*1000);
         	circles[i].startAnimation(rotator);
         }
 	}
 
+	public void hideWheelsBasedOnTimer(){
+		Log.i("CIRCLES", "to hide " + circlesToHide );
+		for(int i = 0; i < circlesToHide; i++){
+			circles[i].setVisibility(View.GONE);
+		}
+		for(int i = circlesToHide; i < circles.length; i++){
+			circles[i].setVisibility(View.VISIBLE);
+		}
+	}
 	public void bringDrawerToLevel(float newLevel){
 		slideDirection = newLevel > currentDrawerLevel ? -1 : 1;
 	
@@ -550,6 +549,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				hideToLeft(whatBtn);
 				mainLogo.setVisibility(View.VISIBLE);
 				revealElementFromTop(mainLogo);
+				info.setVisibility(View.VISIBLE);
+				revealFromRight(info);
 				
 				loggedIn = true;
 			}
@@ -587,7 +588,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					hideElementToTop(go);
 					showStripes();
 					revealElementFromTop(startBtn);
-				
 
 					destroyRecorder(false);
 				}
@@ -599,12 +599,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				clearClipData();
 				
 				wheel.setVisibility(View.GONE);					
-				revealFromRight(info);
+				
 				ensureRecorderShown();
 				
 				if(loggedIn){
 					mainLogo.setVisibility(View.VISIBLE);
 					revealElementFromTop(mainLogo);
+					info.setVisibility(View.VISIBLE);
+					revealFromRight(info);
 				}
 				else{
 					mainLogo.setVisibility(View.GONE);
@@ -641,7 +643,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				
 				record.setVisibility(View.VISIBLE);
 				revealElementFromTop(record);
-				
 				
 				hideToRight(info);
 				wheel.setVisibility(View.VISIBLE);
@@ -729,7 +730,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		startTimestampOfDrop = 0;
 		recordStartTimeStamp = lastAccel.t;
 		freefallDuration = 0;
-		
+
+		mHandler.removeCallbacks(mUpdateTimeTask);  //Remove old timer
+		mHandler.postDelayed(mUpdateTimeTask, 500); //How fast thread updated
+
 		changeState(GameState.kFFStatePreDropRecording);
 	}
 
@@ -939,20 +943,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		}
 	}
 	
-	/*
-	private String getVideoMetaPath() {
-		String metaDirPath = OutputFile.getAbsolutePath() + metaDir;
-		File metaDirector = new File(metaDirPath);
-		if (!metaDirPath.exists()) {
-			// if the video directory doesn't exist yet, create
-			// it. We want all the parent directories of the dir
-			// to exist as well
-			metaDirPath.mkdirs();
-		}
-		
-		return metaDirPath.getAbsolutePath() + ".meta";
-	}
-	*/
 
 	//SCORE VIEW ACTIONS
 	public void replayClip(View view){
@@ -1031,18 +1021,29 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				    }
 				}
 			    else {
-			        if(belowThreshold){
-			        	//Log.i("ACCEL", "Above THRESHOLD" + ( (a.t - startTimestampOfDrop)  / kFFFallTimeThreshold )  );
-			        }
 			    	belowThreshold = false;
 			    }
-	
+				
+
+
 			   //TEST FOR TIMEOUT
 				float timeSinceRecord = (a.t - recordStartTimeStamp)/1000000.0f;
                if( timeSinceRecord > kRecordingTimeout){
-            	   Log.i("ACCEL", "TIMEOUT " + ( timeSinceRecord  + " / " + kRecordingTimeout )  );
+            	   //Log.i("ACCEL", "TIMEOUT " + ( timeSinceRecord  + " / " + kRecordingTimeout )  );
                    cancelDrop(cancelBtn);
-               }                   
+               }
+               else{
+               		int thisCirclesToHide = circles.length  - (int) (circles.length * (timeSinceRecord / kRecordingTimeout) );
+               		if(thisCirclesToHide != circlesToHide){
+               			circlesToHide = thisCirclesToHide;
+               			//Log.i("CIRCLES", "TO HIDE " + thisCirclesToHide);
+               			runOnUiThread( new Runnable(){
+               				public void run() {
+               					hideWheelsBasedOnTimer();
+               				}
+   	   					});
+               		}
+               }
 			}
 			else if(state == GameState.kFFStateInFreeFall){
 				
@@ -1061,7 +1062,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
                 	fallEnded();
                 }
                 
-                Log.i("ACCEL", "FALLING delta force: " + deltaForce + " distance accum " + distanceAccum + " / " + kFFImpactThreshold);
+                //Log.i("ACCEL", "FALLING delta force: " + deltaForce + " distance accum " + distanceAccum + " / " + kFFImpactThreshold);
 
             }
 		}
