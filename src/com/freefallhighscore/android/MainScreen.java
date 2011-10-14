@@ -173,6 +173,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		//videoLoadSpinner = (Spinner)findViewById(R.id.videoPlaybackSpinner);
 
 		Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Univers_65_Bold.ttf");
+		whatBtn.setTypeface(tf);
+		loginBtn.setTypeface(tf);
 		startBtn.setTypeface(tf);
 		cancelBtn.setTypeface(tf);
 		deleteBtn.setTypeface(tf);
