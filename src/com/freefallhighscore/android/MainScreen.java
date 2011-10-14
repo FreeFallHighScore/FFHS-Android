@@ -422,9 +422,11 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	}
 
 	public void hideWheelsBasedOnTimer(){
-		Log.i("CIRCLES", "to hide " + circlesToHide );
+		Log.i("State", "to hide " + circlesToHide );
 		for(int i = 0; i < circlesToHide; i++){
+			circles[i].clearAnimation();
 			circles[i].setVisibility(View.GONE);
+			
 		}
 		for(int i = circlesToHide; i < circles.length; i++){
 			circles[i].setVisibility(View.VISIBLE);
@@ -1033,7 +1035,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
                    cancelDrop(cancelBtn);
                }
                else{
-               		int thisCirclesToHide = circles.length  - (int) (circles.length * (timeSinceRecord / kRecordingTimeout) );
+               		int thisCirclesToHide =  (int) (circles.length * (timeSinceRecord / kRecordingTimeout) );
                		if(thisCirclesToHide != circlesToHide){
                			circlesToHide = thisCirclesToHide;
                			//Log.i("CIRCLES", "TO HIDE " + thisCirclesToHide);
