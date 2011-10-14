@@ -3,47 +3,41 @@
      android:layout_width="fill_parent"
      android:layout_height="wrap_content"
      android:orientation="vertical"
-     android:background="@color/list_bg"
-     android:paddingTop="5dip"
-     >
+     android:background="@color/list_bg">
 
 	<ImageView
 		android:id="@+id/videoThumb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/camera_temp"
-        android:layout_marginLeft="10dip"
+        android:src="@drawable/trophy"
         />
      <TextView
 		android:id="@+id/standingText"
 		android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/videoThumb"
-   		android:layout_marginLeft="10dip"
-		android:padding="5px"
-        android:background="#f26722"
-		android:textColor="#000000"
-		android:textSize="16sp" />
+   		android:layout_marginLeft="5dip"
+		android:padding="3px"
+        android:background="#FCBD00"
+		android:textColor="#000000" />
 
      <TextView android:id="@+id/scoreText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:layout_below="@id/standingText"
 		android:layout_toRightOf="@id/videoThumb"
-		android:layout_marginLeft="10dip"
-		android:padding="5px"
-		android:textColor="#000000"
-		android:textSize="16sp"/>
+		android:layout_marginLeft="5dip"
+		android:padding="3px"
+		android:textColor="#000000"/>
          
      <TextView
-		android:id="@+id/extraText"
+		android:id="@+id/userText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" 
         android:layout_below="@id/standingText"  
         android:layout_toRightOf="@id/videoThumb"
         android:layout_marginLeft="100dip"
-  		android:padding="5px"
-        android:textColor="#000000"
-        android:textSize="16sp" />
+  		android:padding="3px"
+        android:textColor="#000000" />
         
  </RelativeLayout>

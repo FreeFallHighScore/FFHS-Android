@@ -20,11 +20,9 @@ import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.app.TabActivity;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -36,7 +34,6 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TabHost;
 import android.widget.Toast;
@@ -51,27 +48,25 @@ public class TabsActivity extends TabActivity{
 
 	TabHost tabHost;
     TabHost.TabSpec spec;
-    boolean listPopulated = false;
-    SimpleAdapter adapter;
 
-    static final ArrayList<HashMap<String,String>> leaderboardList = 
+
+    static final ArrayList<HashMap<String,String>> myList = 
         	 new ArrayList<HashMap<String,String>>(); 
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_layout);
+        
         
         Resources res = getResources();
         tabHost = getTabHost();
         tabHost.setup();
                 
             
-        ListView   leaderboard    = (ListView)   findViewById(R.id.leaderboard);
-        ListView   myDrops         = (ListView)   findViewById(R.id.myDrops);
-        ScrollView instructions   = (ScrollView) findViewById(R.id.instructions);
-        ScrollView about		  = (ScrollView) findViewById(R.id.about);
-
+        ListView leaderboard      = (ListView) findViewById(R.id.leaderboard);
+        ListView personalScores   = (ListView) findViewById(R.id.personalScores);
+        LinearLayout instructions = (LinearLayout) findViewById(R.id.instructions);
         
         spec = tabHost
         		.newTabSpec("Leaderboard")
@@ -82,7 +77,7 @@ public class TabsActivity extends TabActivity{
         spec = tabHost
         		.newTabSpec("My Drops")
         		.setIndicator("My Drops",res.getDrawable(R.drawable.ic_mydrops_tab))
-        		.setContent(R.id.myDrops);
+        		.setContent(R.id.personalScores);
         tabHost.addTab(spec);
 
         spec = tabHost
@@ -91,27 +86,33 @@ public class TabsActivity extends TabActivity{
         		.setContent(R.id.instructions);
         tabHost.addTab(spec);
         
-        spec = tabHost
-        		.newTabSpec("About")
-        		.setIndicator("About",res.getDrawable(R.drawable.ic_about_tab))
-        		.setContent(R.id.about);
-        tabHost.addTab(spec);
-
-        if(!listPopulated){
-	        populateList("author", "http://freefallhighscore.com/videos.json", leaderboardList, leaderboard);
-	       // populateList("author", "http://freefallhighscore.com/videos.json", myDropsList, myDrops);
-
-	        listPopulated=true;
-        }
+        
+        SimpleAdapter adapter = new SimpleAdapter(
+        		this,
+        		myList,
+        		R.layout.leaderboard_item,
+        		new String[] {"standing","score","user", "thumbnail_url"},
+        		new int[] {R.id.standingText,R.id.scoreText, R.id.userText, R.id.videoThumb}
+        		);
+        populateList();
+  		leaderboard.setAdapter(adapter);
+  		
+  		leaderboard.setOnItemClickListener(new OnItemClickListener() {
+  			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+  				Log.i("State", "view " + view);
+  				//Toast.makeText(getApplicationContext(), "position: " + position, Toast.LENGTH_SHORT).show();
+  			}
+  		});
   		
   	
     }
 
-    private void populateList(String extraText, String jsonUrl, final ArrayList<HashMap<String, String>> list, ListView lv) {
+    private void populateList() {
     	HashMap<String,String> temp = new HashMap<String,String>();
     	        
         try {
-            URL url = new URL(jsonUrl);
+            URL url = new URL(
+                    "http://freefallhighscore.com/videos.json");
             URLConnection connection = url.openConnection();
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
@@ -122,36 +123,14 @@ public class TabsActivity extends TabActivity{
  
                 for (int i = 0; i < ja.length(); i++) {
                     JSONObject jo = (JSONObject) ja.get(i);
-                    int rank = Integer.valueOf(jo.getString("rank"));
-                    switch(rank){
-                    case 1:
-                    	temp.put("standing", "LEADER");
-                    	break;
-                    case 2:
-                    	temp.put("standing", "SECOND");
-                    	break;
-                    case 3:
-                    	temp.put("standing", "THIRD");
-                    	break;
-                    default:
-                    	temp.put("standing", String.valueOf(rank));
-                    	break;
-                    }                    
-                   	float milliseconds = Float.valueOf(jo.getString("drop_time"));
+                    Log.i("State", jo.getString("rank"));
+                	temp.put("standing",jo.getString("rank"));
+                	float milliseconds = Float.valueOf(jo.getString("drop_time"));
                 	temp.put("score", String.valueOf(milliseconds/1000.0));
-                	temp.put("extraText", jo.getString(extraText));
+                	temp.put("user", jo.getString("author"));
                 	temp.put("video_url", jo.getString("video_url"));
                 	temp.put("thumbnail_url", jo.getString("thumbnail_url"));
-                	
-                	adapter = new SimpleAdapter(
-                    		this,
-                    		list,
-                    		R.layout.list_item,
-                    		new String[] {"standing","score","extraText"},
-                    		new int[] {R.id.standingText,R.id.scoreText, R.id.extraText}
-                    		);
-                	
-                	list.add(temp);
+                	myList.add(temp);
                 	temp = new HashMap<String,String>();
                 }
             }
@@ -165,18 +144,6 @@ public class TabsActivity extends TabActivity{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-  		lv.setAdapter(adapter);
-  		
-  		lv.setOnItemClickListener(new OnItemClickListener() {
-  			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-  				Log.i("State", "position " + position);
-  				HashMap<String, String> hm = list.get(position);
-  		        String videoUrl = hm.get("video_url");
-  				Log.i("State", "url " + videoUrl);
-  				Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse( videoUrl ) );
-  			    startActivity( browse );
-  			}
-  		});
     }
     /*
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -186,7 +153,5 @@ public class TabsActivity extends TabActivity{
         
     }
     */
-    
-
     
 }

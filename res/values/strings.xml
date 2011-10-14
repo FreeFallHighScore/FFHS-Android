@@ -2,55 +2,28 @@
 <resources>
     <string name="hello">Hello World, SplashActivity!</string>
     <string name="app_name">FreefallHS</string>
-    
     <string name="info_about_head">ABOUT</string>
-<string name="info_about">
-ABOUT\n
-\n
-Freefall Highscore encourages you to drop you device from high places to achieve the longest duration of free fall. We\'ll record the video and let you submit it to the website featuring the leading drops.\n
-\n
-http://freefallhighscore.com \n
-\n
-James George - concept and direction, iOS development\n
-Logan Best - web development\n
-Michael Zick Doherty - Android development\n
-Robert Gay - Android development\n
-Helen Mair - graphic design\n
-Maria Mendez - iOS development\n
-Caitlin Morris - exhibition design\n
-Juan Muller - iOS and web development\n
-\n
-Developed with support from The Creators Project and Eyebeam Art+Technology Center\n
-\n
-Built using open source code by\n
-Stig Brautaset and Hunter and Johnson.\n
-\n
-DISCLAIMER\n
-\n
-In no event shall the developers of this application be liable for any damages (including, without limitation, personal injury, injury to a third party, damage to property, lost profits, business interruption, or lost information) rising out of \'Authorized Users\' use of or inability to use the FreefallHS MOBILE APP, even if we has been advised of the possibility of such damages. The application developers shall have no liability with respect to the content submitted by the FreefallHS MOBILE APP or any part thereof, including but not limited to errors or omissions contained therein, libel, infringements of rights of publicity, privacy, trademark rights, business interruption, personal injury, damage to property, loss of privacy, moral rights or the disclosure of confidential information.\n
-\n
-We reserve the right to remove any submitted content that we deem to be inappropriate or inauthentic use of the application.<br/>
+<string name="info_about">Freefall Highscore encourages you to drop you device from high places to achieve the longest duration of free fall. We\'ll record the video and let you submit it to the website featuring the leading drops.<br />
+<br />
+James George - concept and direction, iOS development<br />
+Logan Best - web development<br />
+Michael Zick Doherty - Android development<br />
+Robert Gay - Android development<br />
+Helen Mair - graphic design<br />
+Maria Mendez - iOS development<br />
+Caitlin Morris - exhibition design<br />
+Juan Muller - iOS and web development<br />
+<br />
+Developed with support from The Creators Project and Eyebeam Art+Technology Center<br />
+<br />
+Built using open source code by<br />
+Stig Brautaset and Hunter and Johnson.<br />
 
 </string>
-
-
-<string name="info_disclaimer_head"></string>
-<string name="info_disclaimer">In no event shall the developers of this application be liable for any damages (including, without limitation, personal injury, injury to a third party, damage to property, lost profits, business interruption, or lost information) rising out of \'Authorized Users\' use of or inability to use the FreefallHS MOBILE APP, even if we has been advised of the possibility of such damages. The application developers shall have no liability with respect to the content submitted by the FreefallHS MOBILE APP or any part thereof, including but not limited to errors or omissions contained therein, libel, infringements of rights of publicity, privacy, trademark rights, business interruption, personal injury, damage to property, loss of privacy, moral rights or the disclosure of confidential information.\n
-\n
+<string name="info_disclaimer_head">DISCLAIMER</string>
+<string name="info_disclaimer">In no event shall the developers of this application be liable for any damages (including, without limitation, personal injury, injury to a third party, damage to property, lost profits, business interruption, or lost information) rising out of \'Authorized Users\' use of or inability to use the FreefallHS MOBILE APP, even if we has been advised of the possibility of such damages. The application developers shall have no liability with respect to the content submitted by the FreefallHS MOBILE APP or any part thereof, including but not limited to errors or omissions contained therein, libel, infringements of rights of publicity, privacy, trademark rights, business interruption, personal injury, damage to property, loss of privacy, moral rights or the disclosure of confidential information.<br />
+<br />
 We reserve the right to remove any submitted content that we deem to be inappropriate or inauthentic use of the application.<br/>
 </string>
-    
-<string name="instructions_0">
-1. Press to start recording
-2. You have 20 seconds to release the phone to the effect of gravity\n
-3. The camera records the whole thing go down\n
-4. Log into your Google account to submit your drop videos\n
-5. Your videos will be ranked on our high score leader board\n
-</string>
-<string name="instructions_1">You have 20 seconds to release the phone to the effect of gravity</string>
-<string name="instructions_2">The camera records the whole thing go down</string>
-<string name="instructions_3">Log into your Google account to submit your drop videos</string>
-<string name="instructions_4">Your videos will be ranked on our high score leader board</string>
-    
 
 </resources>
