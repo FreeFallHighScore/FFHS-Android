@@ -1,7 +1,11 @@
 package com.freefallhighscore.android;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -100,7 +104,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 
 	File OutputFile = new File(Environment.getExternalStorageDirectory().getPath());
 	String videoDir = "/DCIM/100MEDIA/Video";
-
+	String metaDir = "/FFHS/meta/";
+	
 	boolean isPaused = true;
 	boolean recording = false;
 	boolean surfaceCreated = false;
@@ -181,8 +186,12 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		currentDrawerLevel = 0.0f;
 		
 		freefallDuration = 0; //fake duration
-		
-		changeState(GameState.kFFStateReadyToDrop);
+		if(loadClipData()){
+			changeState(GameState.kFFStateFinishedDropScoreView);
+		}
+		else{
+			changeState(GameState.kFFStateReadyToDrop);	
+		}
 	}
 
 	/*
@@ -537,6 +546,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				//loginBtn.setVisibility(View.GONE);
 				hideToRight(sideLogo);
 				hideToLeft(loginBtn);
+				hideToLeft(whatBtn);
 				mainLogo.setVisibility(View.VISIBLE);
 				revealElementFromTop(mainLogo);
 				
@@ -576,10 +586,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					hideElementToTop(go);
 					showStripes();
 					revealElementFromTop(startBtn);
-					
-					revealFromRight(info);
-
-					wheel.setVisibility(View.GONE);					
+				
 
 					destroyRecorder(false);
 				}
@@ -588,6 +595,10 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					revealFromLeft(startBtn);
 				}
 				
+				clearClipData();
+				
+				wheel.setVisibility(View.GONE);					
+				revealFromRight(info);
 				ensureRecorderShown();
 				
 				if(loggedIn){
@@ -598,6 +609,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					mainLogo.setVisibility(View.GONE);
 					sideLogo.setVisibility(View.VISIBLE);
 					revealFromRight(sideLogo);
+					revealFromLeft(whatBtn);
 					revealFromLeft(loginBtn);
 				}
 								
@@ -612,6 +624,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 					hideElementToTop(mainLogo);
 				}
 				else{
+					hideToLeft(whatBtn);
 					hideToLeft(loginBtn);
 					hideToRight(sideLogo);
 				}				
@@ -633,12 +646,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				wheel.setVisibility(View.VISIBLE);
 
 				hideStripes();
-				
-				//TODO: add drop circle
-				//circle.setVisibility(0);
-				//circle.startAnimation(rotate);
-				//slide(circle,0,0,100,0,1000);
-				
+								
 			break;
 
 			
@@ -647,6 +655,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 				hideElementToTop(go);
 				bringDrawerToLevel(0);
 				hideToRight(cancelBtn);
+				wheel.setVisibility(View.GONE);
+				
 			break;
 			
 			case kFFStateFinishedDropPostroll:
@@ -665,6 +675,14 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			break;
 			
 			case kFFStateFinishedDropScoreView:
+				if(state == GameState.kFFStateJustOpened){
+					hideToLeft(whatBtn,0);
+					hideToLeft(loginBtn,0);
+					hideToRight(sideLogo,0);
+					hideToLeft(startBtn);
+					hideElementToTop(mainLogo);
+				}
+
 				scoreText.setVisibility(View.VISIBLE);
 				revealElementFromTop(scoreText);
 				
@@ -814,7 +832,6 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		
 		changeState(GameState.kFFStateFinishedDropPostroll);
 		
-		
 		t.start();
 	}
 	
@@ -826,6 +843,8 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		destroyRecorder(true);
 		
 		playbackClip();
+		
+		writeClipData();
 	}
 	
 	protected void playbackClip(){
@@ -877,12 +896,70 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		player.prepareAsync();		
 	}
 	
+	public void writeClipData() {
+		String eol = System.getProperty("line.separator");
+		
+		try {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+					openFileOutput("FFHSVideoKey", MODE_PRIVATE)));
+			writer.write("" + freefallDuration + eol);
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean loadClipData() {		
+		try {
+			BufferedReader input = new BufferedReader(new InputStreamReader(
+					openFileInput("FFHSVideoKey")));
+			String line = input.readLine(); 
+			if(line == "clear"){
+				return false;
+			}
+			freefallDuration = (new Long(line)).longValue();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;	
+	}
+	
+	public void clearClipData(){
+		String eol = System.getProperty("line.separator");
+		
+		try {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+					openFileOutput("FFHSVideoKey", MODE_PRIVATE)));
+			writer.write("clear" + eol);
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/*
+	private String getVideoMetaPath() {
+		String metaDirPath = OutputFile.getAbsolutePath() + metaDir;
+		File metaDirector = new File(metaDirPath);
+		if (!metaDirPath.exists()) {
+			// if the video directory doesn't exist yet, create
+			// it. We want all the parent directories of the dir
+			// to exist as well
+			metaDirPath.mkdirs();
+		}
+		
+		return metaDirPath.getAbsolutePath() + ".meta";
+	}
+	*/
+
 	//SCORE VIEW ACTIONS
 	public void replayClip(View view){
 		playbackClip();
 	}
 	
 	public void deleteClip(View view){
+		clearClipData();
 		changeState(GameState.kFFStateReadyToDrop);
 	}
 	
