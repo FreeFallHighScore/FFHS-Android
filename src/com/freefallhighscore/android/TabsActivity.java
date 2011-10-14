@@ -1,18 +1,41 @@
 package com.freefallhighscore.android;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.ListActivity;
 import android.app.TabActivity;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
-import android.widget.TabHost.TabContentFactory;
 import android.widget.Toast;
 
 /**
@@ -21,77 +44,114 @@ import android.widget.Toast;
  * maintain tab state much easier and you don't have to constantly re-create each tab
  * activity when the tab is selected.
  */
-public class TabsActivity extends TabActivity implements OnTabChangeListener {
+public class TabsActivity extends TabActivity{
 
-	private static final String LIST1_TAB_TAG = "List1";
-	private static final String LIST2_TAB_TAG = "List2";
+	TabHost tabHost;
+    TabHost.TabSpec spec;
 
-	// The two views in our tabbed example
-	private ListView listView1;
-	private ListView listView2;
 
-	private TabHost tabHost;
+    static final ArrayList<HashMap<String,String>> myList = 
+        	 new ArrayList<HashMap<String,String>>(); 
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.tab_layout);
+        
+        
+        Resources res = getResources();
+        tabHost = getTabHost();
+        tabHost.setup();
+                
+            
+        ListView leaderboard      = (ListView) findViewById(R.id.leaderboard);
+        ListView personalScores   = (ListView) findViewById(R.id.personalScores);
+        LinearLayout instructions = (LinearLayout) findViewById(R.id.instructions);
+        
+        spec = tabHost
+        		.newTabSpec("Leaderboard")
+        		.setIndicator("Leaderboard",res.getDrawable(R.drawable.ic_leaderboard_tab))
+        		.setContent(R.id.leaderboard);
+        tabHost.addTab(spec);
+        
+        spec = tabHost
+        		.newTabSpec("My Drops")
+        		.setIndicator("My Drops",res.getDrawable(R.drawable.ic_mydrops_tab))
+        		.setContent(R.id.personalScores);
+        tabHost.addTab(spec);
 
-		tabHost = getTabHost();
-		tabHost.setOnTabChangedListener(this);
+        spec = tabHost
+        		.newTabSpec("Instructions")
+        		.setIndicator("Instructions",res.getDrawable(R.drawable.ic_instructions_tab))
+        		.setContent(R.id.instructions);
+        tabHost.addTab(spec);
+        
+        
+        SimpleAdapter adapter = new SimpleAdapter(
+        		this,
+        		myList,
+        		R.layout.leaderboard_item,
+        		new String[] {"standing","score","user", "thumbnail_url"},
+        		new int[] {R.id.standingText,R.id.scoreText, R.id.userText, R.id.videoThumb}
+        		);
+        populateList();
+  		leaderboard.setAdapter(adapter);
+  		
+  		leaderboard.setOnItemClickListener(new OnItemClickListener() {
+  			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+  				Log.i("State", "view " + view);
+  				//Toast.makeText(getApplicationContext(), "position: " + position, Toast.LENGTH_SHORT).show();
+  			}
+  		});
+  		
+  	
+    }
 
-		// setup list view 1
-		listView1 = (ListView) findViewById(R.id.list1);
-
-		// create some dummy strings to add to the list
-		List<String> list1Strings = new ArrayList<String>();
-		list1Strings.add("Item 1");
-		list1Strings.add("Item 2");
-		list1Strings.add("Item 3");
-		list1Strings.add("Item 4");
-		listView1.setAdapter(new ArrayAdapter(this, android.R.layout.simple_list_item_1, list1Strings));
-
-		// setup list view 2
-		listView2 = (ListView) findViewById(R.id.list2);
-
-		// create some dummy strings to add to the list (make it empty initially)
-		List<String> list2Strings = new ArrayList<String>();
-		listView2.setAdapter(new ArrayAdapter(this, android.R.layout.simple_list_item_1, list2Strings));
-
-		// add an onclicklistener to add an item from the first list to the second list
-		listView1.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView parent, View view, int position, long id) {
-				String item = (String) listView1.getAdapter().getItem(position);
-				if(item != null) {
-					((ArrayAdapter) listView2.getAdapter()).add(item);
-					Toast.makeText(TabsActivity.this, item + " added to list 2", Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-
-		// add views to tab host
-		tabHost.addTab(tabHost.newTabSpec(LIST1_TAB_TAG).setIndicator(LIST1_TAB_TAG).setContent(new TabContentFactory() {
-			public View createTabContent(String arg0) {
-				return listView1;
-			}
-		}));
-		tabHost.addTab(tabHost.newTabSpec(LIST2_TAB_TAG).setIndicator(LIST2_TAB_TAG).setContent(new TabContentFactory() {
-			public View createTabContent(String arg0) {
-				return listView2;
-			}
-		}));
-
-	}
-
-	/**
-	 * Implement logic here when a tab is selected
-	 */
-	public void onTabChanged(String tabName) {
-		if(tabName.equals(LIST2_TAB_TAG)) {
-			//do something
-		}
-		else if(tabName.equals(LIST1_TAB_TAG)) {
-			//do something
-		}
-	}
+    private void populateList() {
+    	HashMap<String,String> temp = new HashMap<String,String>();
+    	        
+        try {
+            URL url = new URL(
+                    "http://freefallhighscore.com/videos.json");
+            URLConnection connection = url.openConnection();
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    connection.getInputStream()));
+ 
+            String line;
+            while ((line = in.readLine()) != null) {
+                JSONArray ja = new JSONArray(line);
+ 
+                for (int i = 0; i < ja.length(); i++) {
+                    JSONObject jo = (JSONObject) ja.get(i);
+                    Log.i("State", jo.getString("rank"));
+                	temp.put("standing",jo.getString("rank"));
+                	float milliseconds = Float.valueOf(jo.getString("drop_time"));
+                	temp.put("score", String.valueOf(milliseconds/1000.0));
+                	temp.put("user", jo.getString("author"));
+                	temp.put("video_url", jo.getString("video_url"));
+                	temp.put("thumbnail_url", jo.getString("thumbnail_url"));
+                	myList.add(temp);
+                	temp = new HashMap<String,String>();
+                }
+            }
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    /*
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.logout_menu, menu);
+        return true;
+        
+    }
+    */
+    
 }

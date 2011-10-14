@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost
+	
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:id="@android:id/tabhost"
+	>
+	
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		
+		>
+
+		<FrameLayout
+			android:id="@android:id/tabcontent"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1">
+			
+			<ListView
+				android:id="@+id/leaderboard"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:divider="#00000000"/>
+			
+			<ListView
+				android:id="@+id/personalScores"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:background="#ffffff" />
+			
+			<LinearLayout
+				android:id="@+id/instructions"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:textColor="#000000"
+				android:background="#ffffff" >
+			
+				<TextView
+				android:id="@+id/instructions"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+				
+				
+				</TextView>	
+				
+			</LinearLayout>
+			
+		</FrameLayout>
+		
+		<TabWidget
+			android:id="@android:id/tabs"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="0"
+			/>
+			
+	</LinearLayout>
+</TabHost>
