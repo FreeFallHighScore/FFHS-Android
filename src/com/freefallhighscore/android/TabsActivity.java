@@ -132,6 +132,8 @@ public class TabsActivity extends TabActivity{
 				YouTubeProfile profile = client.getYouTubeProfile();
 				
 				userName = profile.username;
+				userName = "neufuture";
+				
 				// TODO: maybe store the username in whatever global storage we settle on
 				Log.d("MYDROPS", profile.username);
 				
@@ -164,8 +166,13 @@ public class TabsActivity extends TabActivity{
  
             String line;
             while ((line = in.readLine()) != null) {
-                JSONArray ja = new JSONArray(line);
- 
+            	Log.i("MYDROPS", "READ JSON FROM " + jsonUrl + " :: " + line);
+            	JSONArray ja = new JSONArray(line);
+            	if(ja.length() == 0){
+            		temp.put("extraText", "You have no videos. Drop one!");
+            		list.add(temp);
+            		return;
+            	}
                 for (int i = 0; i < ja.length(); i++) {
                     JSONObject jo = (JSONObject) ja.get(i);
                     int rank = Integer.valueOf(jo.getString("rank"));

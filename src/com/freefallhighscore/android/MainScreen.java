@@ -560,6 +560,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		case UPLOAD_VIDEO:
 			if (resultCode == Activity.RESULT_OK) {
 				changeState(GameState.kFFStateFinishedUpload);
+				clearClipData();
 			}
 			break;
 		}
@@ -705,7 +706,7 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 			break;
 
 			case kFFStateFinishedUpload:
-				
+				hideElementToTop(scoreText);
 				submitBtn.setVisibility(View.GONE);
 				replayBtn.setVisibility(View.GONE);
 				deleteBtn.setVisibility(View.GONE);
