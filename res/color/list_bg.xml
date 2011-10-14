@@ -3,7 +3,7 @@
 <item 
 	android:state_selected="false"
     android:state_pressed="false" 
-    android:drawable="@color/transparent" />
+    android:drawable="@color/white" />
     
 <item
 	android:state_pressed="true" 
@@ -12,5 +12,5 @@
 <item
 	android:state_selected="true"
 	android:state_pressed="false" 
-    android:drawable="@color/transparent" />
+    android:drawable="@color/gray" />
 </selector>
