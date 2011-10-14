@@ -145,7 +145,7 @@
 		android:background="@drawable/delete_btn"
 		android:gravity="top|center_horizontal"
 		android:paddingLeft="45dip"
-		android:paddingTop="5dip"
+		android:paddingTop="8dip"
 		android:onClick="cancelDrop"
 		android:visibility="gone"
 	    />

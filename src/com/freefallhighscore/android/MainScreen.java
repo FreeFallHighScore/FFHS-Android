@@ -175,8 +175,11 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 		Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Univers_65_Bold.ttf");
 		startBtn.setTypeface(tf);
 		cancelBtn.setTypeface(tf);
+		deleteBtn.setTypeface(tf);
+		playAgainBtn.setTypeface(tf);
 		go.setTypeface(tf);
 		scoreText.setTypeface(tf);
+		successText.setTypeface(tf);
 		
 		centerStripes = (ImageView) findViewById(R.id.center);
 		drawable = (ClipDrawable) centerStripes.getDrawable();
