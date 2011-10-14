@@ -324,7 +324,6 @@ public class UploadActivity extends Activity implements OnClickListener {
 				});
 			}
 		}
-
 	}
 	
 	private void updateLoginLogoutButtonDisplay() {

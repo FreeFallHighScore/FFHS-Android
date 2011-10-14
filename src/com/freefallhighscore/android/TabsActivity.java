@@ -18,6 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.freefallhighscore.android.youtube.OAuthConfig;
+import com.freefallhighscore.android.youtube.YouTubeClient;
+import com.freefallhighscore.android.youtube.YouTubeProfile;
+
 import android.app.ListActivity;
 import android.app.TabActivity;
 import android.content.Intent;
@@ -53,10 +57,15 @@ public class TabsActivity extends TabActivity{
     TabHost.TabSpec spec;
     boolean listPopulated = false;
     SimpleAdapter adapter;
-
+    private boolean loggedIn;
+    private String userName;
+    
     static final ArrayList<HashMap<String,String>> leaderboardList = 
         	 new ArrayList<HashMap<String,String>>(); 
+    static final ArrayList<HashMap<String,String>> myDropsList = 
+       	 new ArrayList<HashMap<String,String>>(); 
     
+    private ListView   leaderboard, myDrops;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,8 +76,9 @@ public class TabsActivity extends TabActivity{
         tabHost.setup();
                 
             
-        ListView   leaderboard    = (ListView)   findViewById(R.id.leaderboard);
-        ListView   myDrops         = (ListView)   findViewById(R.id.myDrops);
+        leaderboard    = (ListView)   findViewById(R.id.leaderboard);
+        myDrops         = (ListView)   findViewById(R.id.myDrops);
+        
         ScrollView instructions   = (ScrollView) findViewById(R.id.instructions);
         ScrollView about		  = (ScrollView) findViewById(R.id.about);
 
@@ -97,16 +107,52 @@ public class TabsActivity extends TabActivity{
         		.setContent(R.id.about);
         tabHost.addTab(spec);
 
+        Intent creator = getIntent();
+        loggedIn = creator.getBooleanExtra("loggedIn", false);
+        
         if(!listPopulated){
 	        populateList("author", "http://freefallhighscore.com/videos.json", leaderboardList, leaderboard);
-	       // populateList("author", "http://freefallhighscore.com/videos.json", myDropsList, myDrops);
+	        if(loggedIn){
+	        	new Thread(new RetrieveYouTubeProfile()).start();
+	        	//populateList("author", "http://freefallhighscore.com/videos.json", myDropsList, myDrops);
+	        }
 
-	        listPopulated=true;
+	        listPopulated = true;
         }
-  		
-  	
     }
-
+    
+	private class RetrieveYouTubeProfile implements Runnable {
+		@Override
+		public void run() {
+			try {
+				// TODO: this should probably be trigger by authactivity returning. but that makes things more complicated,
+				// so this will do for now. We should also check whether or not we have the username when we first load
+				// this activity
+				YouTubeClient client = YouTubeClient.buildAuthorizedClient(OAuthConfig.getInstance(TabsActivity.this), getString(R.string.devId));
+				YouTubeProfile profile = client.getYouTubeProfile();
+				
+				userName = profile.username;
+				// TODO: maybe store the username in whatever global storage we settle on
+				Log.d("MYDROPS", profile.username);
+				
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						populateList("author", "http://freefallhighscore.com/users/" + userName + "/videos.json", myDropsList, myDrops);
+					}
+				});
+			} catch (IOException e) {
+				Log.e("MYDROPS", "Error", e);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						
+					}
+				});
+			}
+		}
+	}
+    
     private void populateList(String extraText, String jsonUrl, final ArrayList<HashMap<String, String>> list, ListView lv) {
     	HashMap<String,String> temp = new HashMap<String,String>();
     	        

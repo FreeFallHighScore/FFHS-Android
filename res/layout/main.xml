@@ -71,8 +71,8 @@
 	     android:src="@drawable/logo_black"
 	     android:layout_alignParentLeft="true"
 	     android:scaleType="matrix"
-	     android:paddingTop="35dip"
-	     android:paddingLeft="50dip"
+	     android:paddingTop="25dip"
+	     android:paddingLeft="60dip"
      	/> 
      	
     <!-- WHITE LOGO -->

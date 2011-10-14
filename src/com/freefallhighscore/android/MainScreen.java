@@ -972,7 +972,9 @@ public class MainScreen extends Activity implements SurfaceHolder.Callback, Sens
 	}
 	
 	public void showInfo(View view){
-		startActivityForResult(new Intent(this, TabsActivity.class), TABS_REQ);
+		Intent i = new Intent(this, TabsActivity.class);
+		i.putExtra("loggedIn", loggedIn);
+		startActivityForResult(i, TABS_REQ);
 	}
 	
 	@Override
