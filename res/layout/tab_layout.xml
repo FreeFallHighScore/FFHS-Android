@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost
+	
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:id="@android:id/tabhost"
+	android:background="#FFFFFFFF"
+	>
+	
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		
+		
+		>
+
+		<FrameLayout
+			android:id="@android:id/tabcontent"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1"
+			>
+			
+			<ListView
+				android:id="@+id/leaderboard"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:divider="#44000000"
+				android:background="#ffffff"
+				android:cacheColorHint="#FFFFFFFF"
+				/>
+			
+			<ListView
+				android:id="@+id/myDrops"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:divider="#44000000"
+				android:background="#ffffff"
+				android:cacheColorHint="#FFFFFFFF"
+				/>
+				
+			<ScrollView
+				android:id="@+id/instructions"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				
+				android:background="#ffffff" 
+				android:padding="20dip">
+				
+				<RelativeLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" >
+				
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/instructions_0"
+						android:textColor="#000000"
+						/>
+				</RelativeLayout>
+		 
+			</ScrollView>
+
+
+			<ScrollView
+				android:id="@+id/about"
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:textColor="#000000"
+				android:background="#ffffff" 
+				android:padding="20dip"
+				>
+				
+				<LinearLayout
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent">
+				
+				
+					<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:text="@string/info_about"
+					android:textColor="#000000"
+					android:autoLink="web"/>
+			
+				</LinearLayout>
+			</ScrollView>
+			
+		</FrameLayout>
+		
+		<TabWidget
+			android:id="@android:id/tabs"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="0"
+			/>
+			
+	</LinearLayout>
+</TabHost>

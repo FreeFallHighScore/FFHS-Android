@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical"
+     android:background="@color/list_bg"
+     android:paddingTop="5dip"
+     >
+
+	<ImageView
+		android:id="@+id/videoThumb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/camera_temp"
+        android:layout_marginLeft="10dip"
+        />
+     <TextView
+		android:id="@+id/standingText"
+		android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/videoThumb"
+   		android:layout_marginLeft="10dip"
+		android:padding="5px"
+        android:background="#f26722"
+		android:textColor="#000000"
+		android:textSize="16sp" />
+
+     <TextView android:id="@+id/scoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_below="@id/standingText"
+		android:layout_toRightOf="@id/videoThumb"
+		android:layout_marginLeft="10dip"
+		android:padding="5px"
+		android:textColor="#000000"
+		android:textSize="16sp"/>
+         
+     <TextView
+		android:id="@+id/extraText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/standingText"  
+        android:layout_toRightOf="@id/videoThumb"
+        android:layout_marginLeft="100dip"
+  		android:padding="5px"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+        
+ </RelativeLayout>
